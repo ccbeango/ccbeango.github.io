@@ -1,0 +1,36 @@
+schema: spec-driven
+
+context: |
+  项目名称：bean-blog
+  项目类型：面向中文技术文章的个人博客
+  技术栈：VitePress、Vue 3、TypeScript、pnpm、Tailwind CSS 4
+  参考源码：D:\Work\Blog\nextjs-blog-template 的 main 分支；将其实际页面与产品能力作为最低功能基线，但不复制 Next.js/React 实现、品牌内容或已知缺陷
+  路由约定：/ 为精选首页，/blog 为全部文章，/blog/<nested-slug> 为支持多段 slug 的文章详情；另外提供标签、归档和 404 页面
+  功能范围：保留参考源码的精选文章、嵌套导航、字数、增强 Markdown、数学公式、活动目录、回顶、Giscus、SEO、robots、sitemap、web manifest、favicon 和 RSS 2.0/Atom/JSON Feed；同时提供搜索、分页、标签、归档、代码复制和完整主题切换
+  视觉方向：简洁、克制、阅读优先；参考 guangzhengli.com 的信息层级与排版，但不复制品牌、内容或源码
+  内容来源：带有 frontmatter 的本地 Markdown 文件
+  部署方式：完全静态生成，适配 GitHub Pages、Cloudflare Pages、Vercel 和 Netlify
+  样式约束：项目 UI 以 Tailwind CSS 4 工具类与主题令牌为主；仅允许 ArticlePage.vue 使用一个 scoped style，以标准 CSS Nesting 适配 VitePress 生成的 Markdown DOM，且必须复用全局设计令牌；不增加 nesting 插件或额外 PostCSS 配置；其他普通 CSS、Vue style、CSS Modules、CSS-in-JS 或内联 style 均禁止
+  格式约束：保持 @antfu/eslint-config 的 formatters 关闭且不使用 Prettier；使用 LF 和文件末尾换行；JS、TS 与 Vue 代码限制为 120 字符，Vue 多属性标签每行一个属性
+  文档语言：所有自然语言说明使用简体中文，但 OpenSpec schema 规定的英文结构和规范关键字必须保持原文
+  生成原则：根据原始需求、项目上下文和依赖产物重新组织内容，不通过逐句翻译已有文档来生成新产物
+
+rules:
+  proposal:
+    - 自然语言说明使用简体中文，内容应直接从项目需求重新组织，不逐句翻译已有产物
+    - 保留模板标题 Why、What Changes、Capabilities、New Capabilities、Modified Capabilities 和 Impact 的英文原文
+    - capability 标识符必须使用 kebab-case 英文，不翻译标识符
+    - 保持简洁，并清楚描述动机、范围、能力和影响
+  specs:
+    - 自然语言说明、Requirement 名称和 Scenario 名称使用简体中文，内容应从需求与 proposal 重新推导
+    - 严格保留 ADDED Requirements、MODIFIED Requirements、REMOVED Requirements、RENAMED Requirements、Requirement 和 Scenario 等 OpenSpec 英文关键字
+    - 严格保留 SHALL、MUST、WHEN、THEN、Reason、Migration、FROM 和 TO 等规范关键字，不得翻译或替换
+    - 每项 Requirement 至少包含一个使用四级标题的 Scenario，并保持 WHEN/THEN 格式
+  design:
+    - 自然语言说明使用简体中文，基于 proposal 和 specs 重新形成技术决策，不逐句翻译已有设计
+    - 保留 Context、Goals / Non-Goals、Goals、Non-Goals、Decisions、Risks / Trade-offs、Migration Plan 和 Open Questions 的英文标题
+    - 每个关键决策都说明理由与备选方案，风险使用“[风险] → 缓解措施”格式
+  tasks:
+    - 任务分组与任务描述使用简体中文，并根据 design 和 specs 重新拆解
+    - 严格保留 `- [ ] X.Y` checkbox 格式，确保 apply 阶段可以解析
+    - 任务按依赖顺序排列，每项任务必须可以独立验证

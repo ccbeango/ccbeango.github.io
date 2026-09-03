@@ -1,0 +1,30 @@
+{
+  "name": "@bean-blog/lxgw-wenkai-lite-webfont",
+  "type": "module",
+  "version": "1.522.0",
+  "private": true,
+  "description": "Self-hosted LXGW WenKai Lite webfont subsets for Bean Blog",
+  "license": "OFL-1.1",
+  "style": "./index.css",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.css"
+    }
+  },
+  "types": "./index.d.ts",
+  "files": [
+    "OFL.txt",
+    "README.md",
+    "UNICODE-LICENSE",
+    "VERSION",
+    "files",
+    "index.css",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "check": "node scripts/verify.mjs",
+    "generate": "python scripts/update.py",
+    "update": "python scripts/update.py --latest"
+  }
+}

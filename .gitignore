@@ -1,0 +1,10 @@
+node_modules/
+.codex/
+/.vitepress/
+src/.vitepress/.temp/
+src/.vitepress/cache/
+src/.vitepress/dist/
+test-results/
+playwright-report/
+coverage/
+*.log

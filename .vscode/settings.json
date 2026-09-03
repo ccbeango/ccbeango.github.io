@@ -1,0 +1,23 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "never"
+  },
+  "editor.formatOnSave": false,
+  "eslint.format.enable": true,
+  "eslint.useFlatConfig": true,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "vue",
+    "json",
+    "jsonc",
+    "yaml",
+    "markdown"
+  ],
+  "[javascript][javascriptreact][typescript][typescriptreact][vue][json][jsonc][yaml][markdown]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  }
+}

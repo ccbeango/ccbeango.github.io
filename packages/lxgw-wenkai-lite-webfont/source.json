@@ -1,0 +1,27 @@
+{
+  "repository": "lxgw/LxgwWenKai-Lite",
+  "tag": "v1.522",
+  "publishedAt": "2026-03-17T15:10:36Z",
+  "releaseUrl": "https://github.com/lxgw/LxgwWenKai-Lite/releases/tag/v1.522",
+  "assets": [
+    {
+      "name": "LXGWWenKaiLite-Regular.ttf",
+      "weight": 400,
+      "size": 13872424,
+      "sha256": "140c99ba4e28e817cec49bf82a0c5fcdc4fe633fb9dfda16d0ee8d59a8545f15",
+      "url": "https://github.com/lxgw/LxgwWenKai-Lite/releases/download/v1.522/LXGWWenKaiLite-Regular.ttf"
+    },
+    {
+      "name": "LXGWWenKaiLite-Medium.ttf",
+      "weight": 500,
+      "size": 13700636,
+      "sha256": "02eb0f8deed11b00481393f5720630ae1a44424f37f4157ea160a69a1c72a0b6",
+      "url": "https://github.com/lxgw/LxgwWenKai-Lite/releases/download/v1.522/LXGWWenKaiLite-Medium.ttf"
+    }
+  ],
+  "unicodeData": {
+    "repository": "chawyehsu/lxgw-wenkai-webfont",
+    "revision": "29da4802a1900032c1630ef8adf446ea647e4c5e",
+    "path": "unicode.json"
+  }
+}
