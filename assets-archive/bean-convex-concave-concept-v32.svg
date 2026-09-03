@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="120 100 960 960" role="img" aria-labelledby="title desc">
+  <title id="title">豆字摄影主题平衡标志</title>
+  <desc id="desc">以豆字中轴结构组织补光灯、对称相机、云台摇臂和摄影滑轨的摄影标志。</desc>
+
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#197554" />
+      <stop offset="1" stop-color="#105f45" />
+    </linearGradient>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffef9" />
+      <stop offset="1" stop-color="#f1f0e9" />
+    </linearGradient>
+    <filter id="depth" x="100" y="70" width="1000" height="1060" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#083c2c" flood-opacity="0.14" />
+    </filter>
+    <mask id="flash-head" x="320" y="100" width="560" height="100" maskUnits="userSpaceOnUse">
+      <rect x="330" y="112" width="540" height="76" rx="22" fill="white" />
+      <rect x="410" y="131" width="380" height="38" rx="10" fill="black" />
+    </mask>
+    <mask id="yoke-pivots" x="365" y="690" width="470" height="210" maskUnits="userSpaceOnUse">
+      <rect x="365" y="690" width="470" height="210" fill="white" />
+      <circle cx="410" cy="732" r="14" fill="black" />
+      <circle cx="790" cy="732" r="14" fill="black" />
+    </mask>
+  </defs>
+
+  <rect x="120" y="100" width="960" height="960" rx="144" fill="url(#background)" />
+
+  <g transform="translate(0 75)">
+    <g filter="url(#depth)">
+      <circle cx="600" cy="200" r="26" fill="url(#surface)" />
+      <rect x="556" y="211" width="88" height="20" rx="10" fill="url(#surface)" />
+
+      <g transform="rotate(-2 600 150)">
+        <rect
+          x="330"
+          y="112"
+          width="540"
+          height="76"
+          rx="22"
+          fill="url(#surface)"
+          mask="url(#flash-head)"
+        />
+
+        <g fill="url(#surface)">
+          <circle cx="440" cy="150" r="8" />
+          <circle cx="480" cy="150" r="8" />
+          <circle cx="520" cy="150" r="8" />
+          <circle cx="560" cy="150" r="8" />
+          <circle cx="600" cy="150" r="8" />
+          <circle cx="640" cy="150" r="8" />
+          <circle cx="680" cy="150" r="8" />
+          <circle cx="720" cy="150" r="8" />
+          <circle cx="760" cy="150" r="8" />
+        </g>
+      </g>
+
+      <g fill="url(#surface)">
+        <rect x="564" y="278" width="72" height="16" rx="8" />
+        <circle cx="600" cy="500" r="14" />
+        <rect x="396" y="676" width="28" height="33" rx="10" />
+        <rect x="776" y="676" width="28" height="33" rx="10" />
+        <rect x="574" y="876" width="52" height="25" rx="10" />
+        <rect x="285" y="926" width="630" height="12" rx="6" />
+        <rect x="285" y="946" width="630" height="12" rx="6" />
+        <rect x="270" y="920" width="30" height="42" rx="6" />
+        <rect x="900" y="920" width="30" height="42" rx="6" />
+        <rect x="520" y="895" width="160" height="42" rx="10" />
+      </g>
+
+      <g mask="url(#yoke-pivots)">
+        <path
+          d="M410 732 L493 829 C506 845 523 855 545 855 H655 C677 855 694 845 707 829 L790 732"
+          fill="none"
+          stroke="url(#surface)"
+          stroke-width="42"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <g fill="url(#surface)">
+          <circle cx="410" cy="732" r="32" />
+          <circle cx="790" cy="732" r="32" />
+        </g>
+      </g>
+
+      <g
+        fill="none"
+        stroke="url(#surface)"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M380 326 H437 C464 326 478 311 481 282 C485 241 512 216 550 216 H650 C688 216 715 241 719 282 C722 311 736 326 763 326 H820 C853 326 878 352 878 386 V550 C878 592 846 625 806 625 H394 C354 625 322 592 322 550 V386 C322 352 347 326 380 326 Z"
+          stroke-width="52"
+          transform="translate(0 30)"
+        />
+
+        <circle cx="600" cy="500" r="84" stroke-width="46" />
+        <circle cx="600" cy="500" r="48" stroke-width="12" />
+      </g>
+    </g>
+  </g>
+</svg>
