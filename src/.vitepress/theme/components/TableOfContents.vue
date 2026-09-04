@@ -135,7 +135,7 @@ onContentUpdated(async () => {
 
 <template>
   <aside
-    :class="headers.length ? 'sticky top-0 z-navigation h-0 xl:top-side-rail-top xl:col-start-3 xl:row-start-1 xl:mt-12 xl:h-auto xl:w-44 xl:self-start' : 'hidden'"
+    :class="headers.length ? 'sticky top-0 z-control h-0 xl:top-side-rail-top xl:col-start-3 xl:row-start-1 xl:mt-12 xl:h-auto xl:w-44 xl:self-start' : 'hidden'"
     aria-label="文章目录"
   >
     <details
@@ -161,7 +161,8 @@ onContentUpdated(async () => {
           <List
             :size="15"
             aria-hidden="true"
-          /> 本文目录
+          />
+          本文目录
         </p>
         <nav
           ref="container"
@@ -185,7 +186,9 @@ onContentUpdated(async () => {
                 class="outline-link block rounded-sm px-1.5 py-1 leading-5 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
                 :href="header.link"
                 :title="header.title"
-              >{{ header.title }}</a>
+              >
+                {{ header.title }}
+              </a>
             </li>
           </ol>
         </nav>

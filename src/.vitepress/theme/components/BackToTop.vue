@@ -18,7 +18,7 @@ onBeforeUnmount(() => window.removeEventListener("scroll", update));
 <template>
   <button
     type="button"
-    class="fixed right-page-gutter bottom-page-gutter z-navigation flex size-control-lg items-center justify-center rounded-md border border-border bg-card text-muted-foreground shadow-md transition-[opacity,transform] hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+    class="fixed right-page-gutter bottom-page-gutter z-control flex size-control-lg items-center justify-center rounded-md border border-border bg-card text-muted-foreground shadow-md transition-[opacity,transform] hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
     :class="visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'"
     aria-label="返回顶部"
     title="返回顶部"

@@ -27,11 +27,11 @@ draft: false
 
 GFM 表格和任务列表无需额外配置：
 
-| 能力 | 构建阶段 | 浏览器阶段 |
-| --- | --- | --- |
-| 代码高亮 | Shiki | 复制按钮 |
-| 搜索 | 索引生成 | 本地匹配 |
-| 目录 | 标题提取 | 章节跟踪 |
+| 能力     | 构建阶段 | 浏览器阶段 |
+| -------- | -------- | ---------- |
+| 代码高亮 | Shiki    | 复制按钮   |
+| 搜索     | 索引生成 | 本地匹配   |
+| 目录     | 标题提取 | 章节跟踪   |
 
 - [x] 写作内容与公开路由解耦
 - [x] 生产环境排除草稿
@@ -94,9 +94,11 @@ const published = (posts: Post[]) => posts.filter(post => !post.draft);
 :::
 
 ::: details 点击查看代码
+
 ```ts
 const message = "Hello, VitePress!";
 ```
+
 :::
 
 ## GitHub Alerts
@@ -151,11 +153,25 @@ const pending = true; // [!code warning]
 
 二级和三级标题由 VitePress 自动生成锚点。点击标题左侧的 `#` 或右侧本文目录后，URL hash 会更新，固定页头也不会遮挡目标标题。
 
-普通内部链接使用公开 `/blog` 地址。需要显示更完整的入口时，可以使用已注册的 `LinkedCard`：
+普通内部链接使用公开 `/blog` 地址。需要显示更完整的文章引用时，使用 `link-card` 容器。第一段必须是一条标准 Markdown 链接，链接文字会成为卡片标题；第二段可以提供一段纯文本说明：
 
-<LinkedCard href="/blog/guide/writing-articles" title="创建和组织文章" description="查看路径、frontmatter、草稿和自动系列配置。" />
+```md
+::: link-card
+[创建和组织文章](/blog/guide/writing-articles)
 
-不要在 Markdown 中任意引入 Vue 组件。新增内容组件时，应在 theme `enhanceApp` 中注册，并补充 renderer 和浏览器测试。
+查看路径、frontmatter、草稿和自动系列配置。
+:::
+```
+
+下面是同一语法的实际渲染结果：
+
+::: link-card
+[创建和组织文章](/blog/guide/writing-articles)
+
+查看路径、frontmatter、草稿和自动系列配置。
+:::
+
+说明段可以省略。链接支持站内绝对路径和完整的 HTTP/HTTPS 地址；站内路径会自动应用 VitePress `base`。起始行不能附加参数，区块内也不能加入多条链接、富文本或嵌套容器。不要在 Markdown 中直接写 Vue 组件。
 
 ## 普通图片
 
@@ -164,3 +180,63 @@ const pending = true; // [!code warning]
 ![Markdown 图片演示](/media/live-photo-sample-poster.png)
 
 VitePress 会为正文图片增加原生 `loading="lazy"`。多张图片的组合方式见[编排多图布局](/blog/guide/image-layouts)。
+
+## 视频
+
+通用视频使用 `::: video <视频地址>`。播放器提供浏览器原生 controls、全屏和移动端内联播放，不会自动播放：
+
+```md
+::: video /media/live-photo-sample.mp4
+![海边风景视频](/media/live-photo-sample-poster.png)
+:::
+```
+
+下面是同一语法的实际渲染结果：
+
+::: video /media/live-photo-sample.mp4
+![海边风景视频](/media/live-photo-sample-poster.png)
+:::
+
+封面图片可以省略：
+
+```md
+::: video https://media.example.com/travel.webm
+:::
+```
+
+视频和封面都支持 `src/public` 下的站内地址或完整远程 URL。远程服务器需要允许浏览器访问媒体资源，并正确支持视频的 MIME type 和 Range 请求。区块内除一张可选 Markdown 封面图片外不能放置正文、多个图片或嵌套 `video`。
+
+## 音乐
+
+音乐卡片使用 `::: music <远程地址> | <歌曲名> | <歌手>`。音频不需要存入项目；使用完整的远程音频直链，可选地在区块内提供一张 Markdown 封面：
+
+```md
+::: music https://cdn.example.com/song.mp3 | 歌曲名 | 歌手
+![歌曲封面](https://images.example.com/cover.jpg)
+:::
+```
+
+更推荐使用 `open.motues.top` 的 `type=details` 接口。此时只需填写平台和歌曲 ID，不需要手工填写歌曲名、歌手或封面：
+
+```md
+::: music https://open.motues.top/music?server=netease&type=details&id=470381097
+:::
+```
+
+下面是同一语法的实际渲染结果。卡片加载时通过 `details` 和 `cover` 自动读取歌曲名、歌手、专辑和封面；只有点击播放后才通过 `url` 获取临时音频地址并打开全局播放器：
+
+::: music https://open.motues.top/music?server=netease&type=details&id=470381097
+:::
+
+全局播放器在客户端路由切换后继续存在，并以 `80×80px` 的小型方形卡片默认悬浮在页面左上角。卡片使用放大、轻度模糊和增强色彩的专辑封面作为连续背景，并叠加玻璃高光与语义遮罩；内部呈现深色圆形唱片、同心纹路和中央圆形专辑封面。播放、暂停或加载图标直接位于唱片中心，不使用独立背景或底部控制面板；播放图标始终显示，播放期间的暂停图标在支持 hover 的设备上仅于播放器 hover 或键盘聚焦时显示，触摸设备保持可见。关闭控件保留易点击的透明区域，仅显示一个使用全站 popover、border 和 accent 语义色的 `16px` 圆点，并以类似消息角标的方式一半外凸于方块右上角。播放时唱片以约 `18s` 一圈的速度缓慢旋转，暂停后停在当前角度，系统要求减少动态效果时不旋转。拖动卡片的非按钮区域可以移动播放器，也可以聚焦播放器后使用方向键移动。播放进度仍可在文章内音乐卡片中调整，页面始终只使用一个 `audio` 元素。
+
+Meting API 的 `server` 支持 `netease`、`tencent`、`kugou`、`baidu` 和 `kuwo`，省略时默认使用 `netease`。`details` 返回的 `url_id` 用于继续获取音频；封面接口接收歌曲 ID，而不是 `pic_id`，组件会自动完成这两个请求。接口还提供歌词、歌单和搜索能力，但单曲卡片目前不需要这些数据。
+
+也可以继续直接使用 Motues 的 `type=url`，但这种方式与普通音频直链一样，需要手工填写展示信息：
+
+```md
+::: music https://open.motues.top/music?server=netease&type=url&id=470381097 | 讲不出再见 | 谭咏麟
+:::
+```
+
+`open.motues.top` 属于第三方服务，可能受可用性、CORS、版权和上游临时地址失效影响；HTTPS 页面会尝试将接口返回的 HTTP 音频地址升级为 HTTPS。需要完全可控时应使用支持 HTTPS、正确 MIME type、Range 请求和跨域访问的音频直链。

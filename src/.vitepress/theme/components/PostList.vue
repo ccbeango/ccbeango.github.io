@@ -27,7 +27,9 @@ defineProps<{ posts: PostData[]; emptyText?: string }>();
             <a
               class="rounded-sm underline decoration-border underline-offset-4 transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               :href="withBase(post.url)"
-            >{{ post.title }}</a>
+            >
+              {{ post.title }}
+            </a>
           </h2>
           <p class="shrink-0 text-sm text-muted-foreground tabular-nums">
             {{ formatDate(post.date) }} · {{ post.wordCount }} 字
@@ -48,7 +50,9 @@ defineProps<{ posts: PostData[]; emptyText?: string }>();
             :key="tag"
             class="rounded-sm hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
             :href="withBase(`/tags/${tagSlug(tag)}`)"
-          >#{{ tag }}</a>
+          >
+            #{{ tag }}
+          </a>
         </div>
       </article>
     </li>

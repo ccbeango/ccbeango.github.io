@@ -14,22 +14,25 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("photo metadata", () => {
   it("formats dimensions and common shooting parameters without exposing GPS", () => {
-    const metadata = formatPhotoMetadata({
-      Make: "samsung",
-      Model: "SM-N9860",
-      LensModel: "Main Camera",
-      DateTimeOriginal: new Date("2026-09-02T02:25:11.000Z"),
-      FocalLength: 7,
-      FocalLengthIn35mmFormat: 25,
-      FNumber: 1.8,
-      ExposureTime: 0.02,
-      ISO: 200,
-      ExposureBiasValue: 0.3,
-      ExifImageWidth: 2992,
-      ExifImageHeight: 2992,
-      latitude: 30.1,
-      longitude: 104.1,
-    }, { source: "/live-images/photo%201.jpg" });
+    const metadata = formatPhotoMetadata(
+      {
+        Make: "samsung",
+        Model: "SM-N9860",
+        LensModel: "Main Camera",
+        DateTimeOriginal: new Date("2026-09-02T02:25:11.000Z"),
+        FocalLength: 7,
+        FocalLengthIn35mmFormat: 25,
+        FNumber: 1.8,
+        ExposureTime: 0.02,
+        ISO: 200,
+        ExposureBiasValue: 0.3,
+        ExifImageWidth: 2992,
+        ExifImageHeight: 2992,
+        latitude: 30.1,
+        longitude: 104.1,
+      },
+      { source: "/live-images/photo%201.jpg" },
+    );
 
     expect(metadata).toMatchObject({
       fileName: "photo 1.jpg",
@@ -50,11 +53,13 @@ describe("photo metadata", () => {
   });
 
   it("uses display dimensions when EXIF is absent", () => {
-    expect(formatPhotoMetadata(undefined, {
-      source: "/images/plain.png?width=800",
-      width: 800,
-      height: 600,
-    })).toEqual({
+    expect(
+      formatPhotoMetadata(undefined, {
+        source: "/images/plain.png?width=800",
+        width: 800,
+        height: 600,
+      }),
+    ).toEqual({
       fileName: "plain.png",
       dimensions: "800 × 600",
       megapixels: "0.5 MP",

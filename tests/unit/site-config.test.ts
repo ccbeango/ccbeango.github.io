@@ -14,15 +14,17 @@ describe("giscus 配置", () => {
   });
 
   it("接受完整配置", () => {
-    expect(isGiscusConfigured({
-      repo: "owner/repo",
-      repoId: "R_1",
-      category: "Announcements",
-      categoryId: "DIC_1",
-      mapping: "pathname",
-      reactionsEnabled: "1",
-      inputPosition: "bottom",
-      lang: "zh-CN",
-    })).toBe(true);
+    expect(
+      isGiscusConfigured({
+        repo: "owner/repo",
+        repoId: "R_1",
+        category: "Announcements",
+        categoryId: "DIC_1",
+        mapping: "pathname",
+        reactionsEnabled: "1",
+        inputPosition: "bottom",
+        lang: "zh-CN",
+      }),
+    ).toBe(true);
   });
 });

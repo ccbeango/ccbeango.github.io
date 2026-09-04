@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PhotoMetadata } from "../../lib/photo-metadata";
-import { Camera, Info, LoaderCircle, Minimize2, X } from "@lucide/vue";
+import { Camera, ChevronLeft, ChevronRight, Info, LoaderCircle, Minimize2, X } from "@lucide/vue";
 import { onContentUpdated } from "vitepress";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { locateAndroidMotionPhoto } from "../../lib/android-motion-photo";
@@ -37,7 +37,14 @@ const isDragging = ref(false);
 const isPreviewLiveLoading = ref(false);
 const isPreviewVideoVisible = ref(false);
 const previewLiveVideoSource = ref("");
+const currentPhotoIndex = ref(-1);
+const photoCount = ref(0);
+const hasPreviousPhoto = computed(() => currentPhotoIndex.value > 0);
+const hasNextPhoto = computed(
+  () => currentPhotoIndex.value >= 0 && currentPhotoIndex.value < photoCount.value - 1,
+);
 let trigger: HTMLImageElement | undefined;
+let previewImages: HTMLImageElement[] = [];
 let documentWasLocked = false;
 let panX = 0;
 let panY = 0;
@@ -149,6 +156,8 @@ function handleWheel(event: WheelEvent) {
 function handlePointerDown(event: PointerEvent) {
   if (event.pointerType !== "mouse" || event.button !== 0 || zoomLevel.value <= 1)
     return;
+  if (event.target instanceof Element && event.target.closest("button"))
+    return;
   const stage = photoStage.value;
   if (!stage)
     return;
@@ -208,12 +217,13 @@ function imageFromEvent(event: Event) {
   return target.closest<HTMLImageElement>("img[data-photo-preview]") ?? undefined;
 }
 
-async function openPhoto(image: HTMLImageElement) {
-  const currentDialog = dialog.value;
-  if (!currentDialog)
-    return;
-  trigger = image;
-  photo.value = {
+function collectPreviewImages(image: HTMLImageElement) {
+  const scope = image.closest<HTMLElement>("[data-photo-preview-scope]");
+  return Array.from((scope ?? document).querySelectorAll<HTMLImageElement>("img[data-photo-preview]"));
+}
+
+function photoFromImage(image: HTMLImageElement): PreviewPhoto {
+  return {
     source: image.currentSrc || image.src,
     alt: image.alt || "照片",
     width: image.naturalWidth || undefined,
@@ -226,18 +236,54 @@ async function openPhoto(image: HTMLImageElement) {
         }
       : undefined,
   };
+}
+
+function resetActivePhoto() {
+  previewPlaybackAttempt += 1;
+  previewMediaObserver?.disconnect();
+  stopPreviewVideo();
+  resetZoom();
   isPreviewVideoVisible.value = false;
-  previewLiveVideoSource.value = photo.value.livePhoto?.video ?? "";
-  showInspector.value = false;
+  isPreviewLiveLoading.value = false;
+  previewAndroidRequest = undefined;
+  releasePreviewAndroidVideo();
   metadata.value = undefined;
   metadataState.value = "idle";
-  resetZoom();
+}
+
+async function selectPhoto(image: HTMLImageElement) {
+  resetActivePhoto();
+  photo.value = photoFromImage(image);
+  currentPhotoIndex.value = previewImages.indexOf(image);
+  previewLiveVideoSource.value = photo.value.livePhoto?.video ?? "";
+  await nextTick();
+  observeActiveMedia();
+  if (showInspector.value)
+    void loadInspectorMetadata();
+}
+
+async function openPhoto(image: HTMLImageElement) {
+  const currentDialog = dialog.value;
+  if (!currentDialog)
+    return;
+  trigger = image;
+  previewImages = collectPreviewImages(image);
+  photoCount.value = previewImages.length;
+  showInspector.value = false;
+  const selection = selectPhoto(image);
   documentWasLocked = document.documentElement.classList.contains("overflow-hidden");
   document.documentElement.classList.add("overflow-hidden");
   if (!currentDialog.open)
     currentDialog.showModal();
-  await nextTick();
-  observeActiveMedia();
+  await selection;
+}
+
+function navigatePhoto(direction: -1 | 1) {
+  if (previewImages.length < 2 || currentPhotoIndex.value < 0)
+    return;
+  const nextImage = previewImages[currentPhotoIndex.value + direction];
+  if (nextImage)
+    void selectPhoto(nextImage);
 }
 
 function handleDocumentClick(event: MouseEvent) {
@@ -250,6 +296,14 @@ function handleDocumentClick(event: MouseEvent) {
 }
 
 function handleDocumentKeydown(event: KeyboardEvent) {
+  if (dialog.value?.open && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+      return;
+    event.preventDefault();
+    event.stopPropagation();
+    navigatePhoto(event.key === "ArrowLeft" ? -1 : 1);
+    return;
+  }
   if (event.key !== "Enter" && event.key !== " ")
     return;
   const image = imageFromEvent(event);
@@ -289,7 +343,7 @@ async function resolvePreviewAndroidVideo(current: PreviewPhoto) {
 
   const source = current.livePhoto?.androidSource ?? current.source;
   isPreviewLiveLoading.value = true;
-  previewAndroidRequest = (async () => {
+  const request = (async () => {
     const response = await fetch(source);
     if (!response.ok)
       throw new Error(`Motion Photo 请求失败：${response.status}`);
@@ -310,13 +364,16 @@ async function resolvePreviewAndroidVideo(current: PreviewPhoto) {
     previewLiveVideoSource.value = objectUrl;
     return objectUrl;
   })();
+  previewAndroidRequest = request;
 
   try {
-    return await previewAndroidRequest;
+    return await request;
   }
   finally {
-    previewAndroidRequest = undefined;
-    isPreviewLiveLoading.value = false;
+    if (previewAndroidRequest === request)
+      previewAndroidRequest = undefined;
+    if (photo.value === current)
+      isPreviewLiveLoading.value = false;
   }
 }
 
@@ -369,17 +426,12 @@ function handlePreviewVideoEnded() {
 function handleClose() {
   const previousTrigger = trigger;
   trigger = undefined;
-  previewPlaybackAttempt += 1;
-  previewMediaObserver?.disconnect();
-  stopPreviewVideo();
-  isPreviewVideoVisible.value = false;
-  isPreviewLiveLoading.value = false;
-  releasePreviewAndroidVideo();
+  resetActivePhoto();
   showInspector.value = false;
-  metadata.value = undefined;
-  metadataState.value = "idle";
-  resetZoom();
   photo.value = undefined;
+  previewImages = [];
+  currentPhotoIndex.value = -1;
+  photoCount.value = 0;
   restoreDocument();
   void nextTick(() => {
     if (previousTrigger?.isConnected)
@@ -408,13 +460,13 @@ async function loadInspectorMetadata() {
       width: current.width,
       height: current.height,
     });
-    if (photo.value?.source !== current.source)
+    if (photo.value !== current)
       return;
     metadata.value = result;
     metadataState.value = "ready";
   }
   catch {
-    if (photo.value?.source === current.source)
+    if (photo.value === current)
       metadataState.value = "error";
   }
 }
@@ -517,6 +569,13 @@ onBeforeUnmount(() => {
             />
           </button>
         </div>
+        <p
+          class="sr-only"
+          aria-live="polite"
+          data-photo-preview-position
+        >
+          第 {{ currentPhotoIndex + 1 }} 张，共 {{ photoCount }} 张：{{ photo.alt }}
+        </p>
         <div
           ref="photoStage"
           class="relative flex min-h-0 touch-pan-y items-center justify-center overflow-hidden p-4 pt-18 sm:p-8 sm:pt-20 lg:p-12"
@@ -528,6 +587,32 @@ onBeforeUnmount(() => {
           @pointerup="finishDrag"
           @wheel.prevent="handleWheel"
         >
+          <button
+            v-if="hasPreviousPhoto"
+            class="absolute top-1/2 left-2 z-control inline-flex size-control-lg -translate-y-1/2 items-center justify-center rounded-md text-overlay-foreground/70 transition-colors hover:bg-overlay-foreground/10 hover:text-overlay-foreground focus-visible:outline-2 focus-visible:outline-ring sm:left-4"
+            type="button"
+            aria-label="上一张照片"
+            title="上一张"
+            @click="navigatePhoto(-1)"
+          >
+            <ChevronLeft
+              :size="30"
+              aria-hidden="true"
+            />
+          </button>
+          <button
+            v-if="hasNextPhoto"
+            class="absolute top-1/2 right-2 z-control inline-flex size-control-lg -translate-y-1/2 items-center justify-center rounded-md text-overlay-foreground/70 transition-colors hover:bg-overlay-foreground/10 hover:text-overlay-foreground focus-visible:outline-2 focus-visible:outline-ring sm:right-4"
+            type="button"
+            aria-label="下一张照片"
+            title="下一张"
+            @click="navigatePhoto(1)"
+          >
+            <ChevronRight
+              :size="30"
+              aria-hidden="true"
+            />
+          </button>
           <video
             v-if="isPreviewVideoVisible"
             ref="previewVideo"
@@ -549,7 +634,7 @@ onBeforeUnmount(() => {
             :src="photo.source"
             :alt="photo.alt"
             @load="() => applyTransform()"
-          >
+          />
           <button
             v-if="photo.livePhoto"
             ref="previewLiveControl"
@@ -573,7 +658,7 @@ onBeforeUnmount(() => {
               alt=""
               aria-hidden="true"
               data-live-photo-mark
-            >
+            />
             <span>LIVE</span>
           </button>
         </div>
@@ -589,9 +674,7 @@ onBeforeUnmount(() => {
               class="size-4.5 text-overlay-foreground/70"
               aria-hidden="true"
             />
-            <h2 class="m-0 text-base font-medium">
-              照片信息
-            </h2>
+            <h2 class="m-0 text-base font-medium">照片信息</h2>
           </div>
 
           <div

@@ -1,11 +1,9 @@
-minimumReleaseAgeExclude:
-  - "@antfu/eslint-config@9.4.1"
-  - eslint-plugin-pnpm@1.9.1
-  - pnpm-workspace-yaml@1.9.1
-
 packages:
   - .
   - packages/*
+
+allowBuilds:
+  simple-git-hooks: false
 
 onlyBuiltDependencies:
   - esbuild

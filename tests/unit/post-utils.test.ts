@@ -47,21 +47,41 @@ describe("frontmatter 与 slug", () => {
   });
 
   it("校验系列名称、正整数顺序和侧栏字段配对", () => {
-    expect(toPostData(entry("guide/intro", {
-      series: { name: " VitePress 指南 ", order: 1 },
-    })).series).toEqual({ name: "VitePress 指南", order: 1 });
-    expect(toPostData(entry("guide/grouped", {
-      series: { name: "指南", order: 1, sidebar: " 文档 ", sidebarOrder: 2 },
-    })).series).toEqual({ name: "指南", order: 1, sidebar: "文档", sidebarOrder: 2 });
-    expect(() => toPostData(entry("guide/invalid", {
-      series: { name: "VitePress 指南", order: 0 },
-    }))).toThrow(/series\.order/);
-    expect(() => toPostData(entry("guide/missing-sidebar-order", {
-      series: { name: "VitePress 指南", order: 1, sidebar: "文档" },
-    }))).toThrow(/series\.sidebarOrder/);
-    expect(() => toPostData(entry("guide/missing-sidebar", {
-      series: { name: "VitePress 指南", order: 1, sidebarOrder: 1 },
-    }))).toThrow(/series\.sidebar/);
+    expect(
+      toPostData(
+        entry("guide/intro", {
+          series: { name: " VitePress 指南 ", order: 1 },
+        }),
+      ).series,
+    ).toEqual({ name: "VitePress 指南", order: 1 });
+    expect(
+      toPostData(
+        entry("guide/grouped", {
+          series: { name: "指南", order: 1, sidebar: " 文档 ", sidebarOrder: 2 },
+        }),
+      ).series,
+    ).toEqual({ name: "指南", order: 1, sidebar: "文档", sidebarOrder: 2 });
+    expect(() =>
+      toPostData(
+        entry("guide/invalid", {
+          series: { name: "VitePress 指南", order: 0 },
+        }),
+      ),
+    ).toThrow(/series\.order/);
+    expect(() =>
+      toPostData(
+        entry("guide/missing-sidebar-order", {
+          series: { name: "VitePress 指南", order: 1, sidebar: "文档" },
+        }),
+      ),
+    ).toThrow(/series\.sidebarOrder/);
+    expect(() =>
+      toPostData(
+        entry("guide/missing-sidebar", {
+          series: { name: "VitePress 指南", order: 1, sidebarOrder: 1 },
+        }),
+      ),
+    ).toThrow(/series\.sidebar/);
   });
 });
 
@@ -74,14 +94,16 @@ describe("系列文章 sidebar", () => {
     ]);
     const sidebar = createSeriesSidebar(posts);
 
-    expect(sidebar["/blog/guide/first.md"]).toEqual([{
-      text: "VitePress 指南",
-      collapsed: false,
-      items: [
-        { text: "第一章", link: "/blog/guide/first" },
-        { text: "第二章", link: "/blog/guide/second" },
-      ],
-    }]);
+    expect(sidebar["/blog/guide/first.md"]).toEqual([
+      {
+        text: "VitePress 指南",
+        collapsed: false,
+        items: [
+          { text: "第一章", link: "/blog/guide/first" },
+          { text: "第二章", link: "/blog/guide/second" },
+        ],
+      },
+    ]);
     expect(sidebar["/blog/guide/second.md"]).toEqual(sidebar["/blog/guide/first.md"]);
     expect(sidebar["/blog/standalone.md"]).toBeUndefined();
   });
@@ -96,10 +118,22 @@ describe("系列文章 sidebar", () => {
 
   it("为共享侧栏的每篇文章生成多个有序系列分组", () => {
     const posts = preparePosts([
-      entry("media/live", { title: "动态照片", series: { name: "媒体", order: 2, sidebar: "写作指南", sidebarOrder: 2 } }),
-      entry("guide/start", { title: "快速开始", series: { name: "基础", order: 1, sidebar: "写作指南", sidebarOrder: 1 } }),
-      entry("media/images", { title: "图片布局", series: { name: "媒体", order: 1, sidebar: "写作指南", sidebarOrder: 2 } }),
-      entry("guide/config", { title: "站点配置", series: { name: "基础", order: 2, sidebar: "写作指南", sidebarOrder: 1 } }),
+      entry("media/live", {
+        title: "动态照片",
+        series: { name: "媒体", order: 2, sidebar: "写作指南", sidebarOrder: 2 },
+      }),
+      entry("guide/start", {
+        title: "快速开始",
+        series: { name: "基础", order: 1, sidebar: "写作指南", sidebarOrder: 1 },
+      }),
+      entry("media/images", {
+        title: "图片布局",
+        series: { name: "媒体", order: 1, sidebar: "写作指南", sidebarOrder: 2 },
+      }),
+      entry("guide/config", {
+        title: "站点配置",
+        series: { name: "基础", order: 2, sidebar: "写作指南", sidebarOrder: 1 },
+      }),
     ]);
     const sidebar = createSeriesSidebar(posts);
     const expected = [
@@ -153,28 +187,34 @@ describe("系列文章 sidebar", () => {
 });
 
 describe("文章集合转换", () => {
-  const posts = preparePosts([
-    entry("old", { date: "2024-01-01", tags: ["工程实践"], featured: true }),
-    entry("new", { date: "2026-01-01", tags: ["VitePress", "工程实践"], featured: true }),
-    entry("draft", { date: "2027-01-01", tags: ["草稿"], draft: true, featured: true }),
-  ], { includeDrafts: true });
+  const posts = preparePosts(
+    [
+      entry("old", { date: "2024-01-01", tags: ["工程实践"], featured: true }),
+      entry("new", { date: "2026-01-01", tags: ["VitePress", "工程实践"], featured: true }),
+      entry("draft", { date: "2027-01-01", tags: ["草稿"], draft: true, featured: true }),
+    ],
+    { includeDrafts: true },
+  );
 
   it("按日期倒序并按发布状态筛选精选", () => {
-    expect(posts.map(post => post.slug)).toEqual(["draft", "new", "old"]);
-    expect(getFeaturedPosts(posts).map(post => post.slug)).toEqual(["new", "old"]);
-    expect(preparePosts([
-      entry("published"),
-      entry("draft", { draft: true }),
-    ]).map(post => post.slug)).toEqual(["published"]);
+    expect(posts.map((post) => post.slug)).toEqual(["draft", "new", "old"]);
+    expect(getFeaturedPosts(posts).map((post) => post.slug)).toEqual(["new", "old"]);
+    expect(preparePosts([entry("published"), entry("draft", { draft: true })]).map((post) => post.slug)).toEqual([
+      "published",
+    ]);
   });
 
   it("按日期倒序限制首页精选数量", () => {
-    const featured = preparePosts(Array.from({ length: 6 }, (_, index) => entry(`featured-${index + 1}`, {
-      date: `2026-01-${String(index + 1).padStart(2, "0")}`,
-      featured: true,
-    })));
+    const featured = preparePosts(
+      Array.from({ length: 6 }, (_, index) =>
+        entry(`featured-${index + 1}`, {
+          date: `2026-01-${String(index + 1).padStart(2, "0")}`,
+          featured: true,
+        }),
+      ),
+    );
 
-    expect(getFeaturedPosts(featured, 5).map(post => post.slug)).toEqual([
+    expect(getFeaturedPosts(featured, 5).map((post) => post.slug)).toEqual([
       "featured-6",
       "featured-5",
       "featured-4",
@@ -196,15 +236,15 @@ describe("文章集合转换", () => {
   });
 
   it("规范化标签、计数并生成稳定 ASCII slug", () => {
-    const tags = collectTags(posts.filter(post => !post.draft));
-    expect(tags.find(tag => tag.name === "工程实践")?.count).toBe(2);
+    const tags = collectTags(posts.filter((post) => !post.draft));
+    expect(tags.find((tag) => tag.name === "工程实践")?.count).toBe(2);
     expect(tagSlug("Tailwind CSS")).toBe("tailwind-css");
     expect(tagSlug("工程实践")).toMatch(/^u[0-9a-f]+(?:-u[0-9a-f]+)*$/);
   });
 
   it("按年份倒序归档且年份内日期倒序", () => {
     const groups = groupArchives(posts);
-    expect(groups.map(group => group.year)).toEqual(["2027", "2026", "2024"]);
+    expect(groups.map((group) => group.year)).toEqual(["2027", "2026", "2024"]);
     expect(groups[1]?.posts[0]?.slug).toBe("new");
   });
 

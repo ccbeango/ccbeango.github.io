@@ -14,9 +14,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: useDevServer
-      ? "pnpm dev --host 127.0.0.1 --port 5173"
-      : "pnpm preview --host 127.0.0.1 --port 4173",
+    command: useDevServer ? "pnpm dev --host 127.0.0.1 --port 5173" : "pnpm preview --host 127.0.0.1 --port 4173",
     url: useDevServer ? "http://127.0.0.1:5173" : "http://127.0.0.1:4173",
     reuseExistingServer: useDevServer,
     timeout: 30_000,

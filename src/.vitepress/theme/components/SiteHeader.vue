@@ -33,7 +33,7 @@ const articleRoute = computed(() =>
           alt=""
           width="36"
           height="36"
-        >
+        />
         <span class="hidden truncate font-bold sm:block">{{ siteConfig.site.name }}</span>
       </a>
       <nav

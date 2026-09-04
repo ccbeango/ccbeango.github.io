@@ -9,12 +9,8 @@ const groups = groupArchives(posts);
 <template>
   <main class="mx-auto w-full max-w-content px-page-gutter pt-12 pb-8 sm:px-page-gutter-wide sm:pt-16">
     <header class="mb-10">
-      <p class="text-xs font-semibold text-muted-foreground uppercase">
-        Timeline
-      </p>
-      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">
-        归档
-      </h1>
+      <p class="text-xs font-semibold text-muted-foreground uppercase">Timeline</p>
+      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">归档</h1>
     </header>
     <div class="space-y-12">
       <section
@@ -37,11 +33,15 @@ const groups = groupArchives(posts);
             <time
               class="w-32 shrink-0 text-sm text-muted-foreground tabular-nums"
               :datetime="post.date"
-            >{{ formatDate(post.date) }}</time>
+            >
+              {{ formatDate(post.date) }}
+            </time>
             <a
               class="min-w-0 font-medium wrap-break-word underline decoration-border underline-offset-4 hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
               :href="withBase(post.url)"
-            >{{ post.title }}</a>
+            >
+              {{ post.title }}
+            </a>
           </li>
         </ol>
       </section>

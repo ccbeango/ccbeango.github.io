@@ -1,10 +1,11 @@
 import type { MarkdownRenderer } from "vitepress";
 
-const PHOTO_PREVIEW_CLASSES = "cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring";
+const PHOTO_PREVIEW_CLASSES =
+  "cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring";
 
 export function photoPreviewPlugin(md: MarkdownRenderer) {
-  const renderImage = md.renderer.rules.image
-    ?? ((tokens, index, options, _env, self) => self.renderToken(tokens, index, options));
+  const renderImage =
+    md.renderer.rules.image ?? ((tokens, index, options, _env, self) => self.renderToken(tokens, index, options));
 
   md.renderer.rules.image = (tokens, index, options, env, self) => {
     const image = tokens[index];

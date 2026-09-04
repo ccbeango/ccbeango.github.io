@@ -13,18 +13,21 @@ async function saveNonblankScreenshot(page: Page, path: string) {
   const screenshot = await page.screenshot({ path, fullPage: true });
   const stats = await sharp(screenshot).stats();
   expect(screenshot.byteLength).toBeGreaterThan(10_000);
-  expect(Math.max(...stats.channels.map(channel => channel.stdev))).toBeGreaterThan(5);
+  expect(Math.max(...stats.channels.map((channel) => channel.stdev))).toBeGreaterThan(5);
 }
 
 async function hasSemanticColor(locator: Locator, property: string, token: string) {
-  return locator.evaluate((element, { property, token }) => {
-    const probe = document.createElement("span");
-    probe.style.setProperty(property, `var(--color-${token})`);
-    element.append(probe);
-    const expected = getComputedStyle(probe).getPropertyValue(property);
-    probe.remove();
-    return getComputedStyle(element).getPropertyValue(property) === expected;
-  }, { property, token });
+  return locator.evaluate(
+    (element, { property, token }) => {
+      const probe = document.createElement("span");
+      probe.style.setProperty(property, `var(--color-${token})`);
+      element.append(probe);
+      const expected = getComputedStyle(probe).getPropertyValue(property);
+      probe.remove();
+      return getComputedStyle(element).getPropertyValue(property) === expected;
+    },
+    { property, token },
+  );
 }
 
 async function expectSemanticColor(locator: Locator, property: string, token: string) {
@@ -44,11 +47,7 @@ async function installLivePhotoProbe(page: Page) {
 
     const originalFetch = window.fetch.bind(window);
     window.fetch = (input, init) => {
-      const url = typeof input === "string"
-        ? input
-        : input instanceof URL
-          ? input.href
-          : input.url;
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       probe.fetches.push(url);
       return originalFetch(input, init);
     };
@@ -56,8 +55,7 @@ async function installLivePhotoProbe(page: Page) {
     const originalCreateObjectUrl = URL.createObjectURL.bind(URL);
     URL.createObjectURL = (object) => {
       const url = originalCreateObjectUrl(object);
-      if (object instanceof Blob && object.type === "video/mp4")
-        probe.videoBlobUrls.push(url);
+      if (object instanceof Blob && object.type === "video/mp4") probe.videoBlobUrls.push(url);
       return url;
     };
 
@@ -70,9 +68,7 @@ async function installLivePhotoProbe(page: Page) {
 }
 
 function readLivePhotoProbe(page: Page) {
-  return page.evaluate(() => (
-    window as typeof window & { __livePhotoProbe: LivePhotoProbe }
-  ).__livePhotoProbe);
+  return page.evaluate(() => (window as typeof window & { __livePhotoProbe: LivePhotoProbe }).__livePhotoProbe);
 }
 
 test.describe("公开页面", () => {
@@ -100,27 +96,26 @@ test.describe("公开页面", () => {
   test("LXGW WenKai Lite 从项目本地加载", async ({ page }) => {
     const fontRequests: string[] = [];
     page.on("request", (request) => {
-      if (/lxgwwenkai|\.woff2(?:$|\?)/i.test(request.url()))
-        fontRequests.push(request.url());
+      if (/lxgwwenkai|\.woff2(?:$|\?)/i.test(request.url())) fontRequests.push(request.url());
     });
 
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
     await page.evaluate(async () => {
       await Promise.all([
-        document.fonts.load("400 16px \"LXGW WenKai Lite\"", "中文"),
-        document.fonts.load("500 16px \"LXGW WenKai Lite\"", "中文"),
+        document.fonts.load('400 16px "LXGW WenKai Lite"', "中文"),
+        document.fonts.load('500 16px "LXGW WenKai Lite"', "中文"),
       ]);
     });
 
     const pageOrigin = new URL(page.url()).origin;
     expect(await page.locator("link[rel='stylesheet'][href*='lxgw-wenkai-lite']").count()).toBe(0);
-    expect(fontRequests.every(url => new URL(url).origin === pageOrigin)).toBe(true);
-    expect(fontRequests.some(url => url.includes("cdn.jsdelivr.net"))).toBe(false);
-    expect(fontRequests.some(url => /lxgwwenkailite-regular-subset-\d+\.woff2/.test(url))).toBe(true);
-    expect(fontRequests.some(url => /lxgwwenkailite-medium-subset-\d+\.woff2/.test(url))).toBe(true);
-    expect(await page.evaluate(() => document.fonts.check("400 16px \"LXGW WenKai Lite\""))).toBe(true);
-    expect(await page.evaluate(() => document.fonts.check("500 16px \"LXGW WenKai Lite\""))).toBe(true);
+    expect(fontRequests.every((url) => new URL(url).origin === pageOrigin)).toBe(true);
+    expect(fontRequests.some((url) => url.includes("cdn.jsdelivr.net"))).toBe(false);
+    expect(fontRequests.some((url) => /lxgwwenkailite-regular-subset-\d+\.woff2/.test(url))).toBe(true);
+    expect(fontRequests.some((url) => /lxgwwenkailite-medium-subset-\d+\.woff2/.test(url))).toBe(true);
+    expect(await page.evaluate(() => document.fonts.check('400 16px "LXGW WenKai Lite"'))).toBe(true);
+    expect(await page.evaluate(() => document.fonts.check('500 16px "LXGW WenKai Lite"'))).toBe(true);
 
     await page.goto("/blog/guide/markdown-extensions");
     await expect(page.getByRole("heading", { level: 1, name: "使用 Markdown 扩展" })).toBeVisible();
@@ -153,7 +148,10 @@ test.describe("公开页面", () => {
 
     if (testInfo.project.name === "desktop") {
       const navigation = page.getByRole("navigation", { name: "主导航" });
-      await expect(navigation.getByRole("link", { name: "使用手册" })).toHaveAttribute("href", "/blog/guide/getting-started");
+      await expect(navigation.getByRole("link", { name: "使用手册" })).toHaveAttribute(
+        "href",
+        "/blog/guide/getting-started",
+      );
       const browse = navigation.getByText("浏览", { exact: true });
       await browse.focus();
       await page.keyboard.press("Enter");
@@ -167,14 +165,18 @@ test.describe("公开页面", () => {
 
     await page.goto("/blog");
     await expect(page.getByRole("heading", { level: 1, name: "全部文章" })).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /下一页/ })).toHaveAttribute("href", "/blog/page/2");
+    await expect(
+      page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /下一页/ }),
+    ).toHaveAttribute("href", "/blog/page/2");
 
     await page.goto("/blog/page/2");
-    await expect(page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /上一页/ })).toHaveAttribute("href", "/blog");
+    await expect(
+      page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /上一页/ }),
+    ).toHaveAttribute("href", "/blog");
 
     await page.goto("/tags");
     await expect(page.getByRole("heading", { level: 1, name: "标签" })).toBeVisible();
-    await expect(page.getByRole("main").locator("a[href=\"/tags/vitepress\"]")).toBeVisible();
+    await expect(page.getByRole("main").locator('a[href="/tags/vitepress"]')).toBeVisible();
 
     await page.goto("/archives");
     await expect(page.getByRole("heading", { level: 1, name: "归档" })).toBeVisible();
@@ -220,17 +222,16 @@ test.describe("公开页面", () => {
 
 test.describe("窄屏文章目录", () => {
   test("滚动后可展开目录并跳转到当前章节", async ({ page }, testInfo) => {
-    if (testInfo.project.name === "desktop")
-      await page.setViewportSize({ width: 1100, height: 700 });
+    if (testInfo.project.name === "desktop") await page.setViewportSize({ width: 1100, height: 700 });
 
     await page.goto("/blog/guide/markdown-extensions");
 
-    const toc = page.locator("aside[aria-label=\"文章目录\"]");
+    const toc = page.locator('aside[aria-label="文章目录"]');
     const outline = toc.locator("details");
     const trigger = toc.getByTitle("本文目录");
     const navigation = toc.getByRole("navigation", { name: "本文目录" });
     const target = page.locator("#标题锚点与内部链接");
-    const targetLink = toc.locator("nav[aria-label=\"本文目录\"] a[href=\"#标题锚点与内部链接\"]");
+    const targetLink = toc.locator('nav[aria-label="本文目录"] a[href="#标题锚点与内部链接"]');
 
     await expect(toc).toBeAttached();
     await expect(trigger).toBeVisible();
@@ -242,7 +243,7 @@ test.describe("窄屏文章目录", () => {
     const initialLayout = await page.evaluate(() => {
       const main = document.querySelector<HTMLElement>("main.VPDoc")!;
       const article = document.querySelector<HTMLElement>("main.VPDoc article")!;
-      const outline = document.querySelector<HTMLElement>("aside[aria-label=\"文章目录\"]")!;
+      const outline = document.querySelector<HTMLElement>('aside[aria-label="文章目录"]')!;
       const details = outline.querySelector<HTMLElement>("details")!;
       return {
         articleOffset: article.getBoundingClientRect().top - main.getBoundingClientRect().top,
@@ -260,7 +261,7 @@ test.describe("窄屏文章目录", () => {
 
     await page.evaluate(() => window.scrollTo(0, 900));
     await expect(trigger).toBeInViewport();
-    expect(await toc.evaluate(element => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
+    expect(await toc.evaluate((element) => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
 
     await trigger.click();
     await expect(outline).toHaveAttribute("open", "");
@@ -315,11 +316,7 @@ test.describe("系列文章导航", () => {
     await expect(navigation.getByText("内容写作", { exact: true })).toBeVisible();
     await expect(navigation.getByText("发布与维护", { exact: true })).toBeVisible();
     await expect(navigation.getByText("Bean Blog 使用手册", { exact: true })).toHaveCount(0);
-    await expect(navigation.locator("[data-series-name]")).toHaveText([
-      "入门与配置",
-      "内容写作",
-      "发布与维护",
-    ]);
+    await expect(navigation.locator("[data-series-name]")).toHaveText(["入门与配置", "内容写作", "发布与维护"]);
     await expect(navigation.locator("[data-series-chapter]")).toHaveCount(0);
     await expect(current).toHaveAttribute("aria-current", "page");
     await expectSemanticColor(current, "background-color", "accent");
@@ -395,20 +392,20 @@ test.describe("系列文章导航", () => {
     await expect(trigger).toHaveClass(/bg-popover\/90/);
     await expectSemanticColor(trigger, "color", "popover-foreground");
     await expect(navigation).toBeHidden();
-    expect(await sidebar.evaluate(element => element.getBoundingClientRect().height)).toBe(0);
+    expect(await sidebar.evaluate((element) => element.getBoundingClientRect().height)).toBe(0);
 
     await trigger.click();
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await expect(navigation).toBeVisible();
     await expectSemanticColor(sidebar.locator("#series-sidebar-navigation"), "background-color", "popover");
     await expectSemanticColor(sidebar.locator("#series-sidebar-navigation"), "color", "popover-foreground");
-    await expect(navigation.locator("[data-series-name]")).toHaveText([
-      "入门与配置",
-      "内容写作",
-      "发布与维护",
-    ]);
+    await expect(navigation.locator("[data-series-name]")).toHaveText(["入门与配置", "内容写作", "发布与维护"]);
     await expect(navigation.locator("[data-series-chapter]")).toHaveCount(0);
-    await expectSemanticColor(navigation.getByRole("link", { name: "使用 Markdown 扩展" }).locator("[data-series-title]"), "color", "accent-foreground");
+    await expectSemanticColor(
+      navigation.getByRole("link", { name: "使用 Markdown 扩展" }).locator("[data-series-title]"),
+      "color",
+      "accent-foreground",
+    );
     await expect(navigation.locator("[data-series-title]").first()).toHaveCSS("font-size", "14px");
     await expect(navigation.getByText("正在阅读", { exact: true })).toHaveCount(0);
     await expect(sidebar.locator("#series-sidebar-navigation")).toHaveCSS("overflow-y", "auto");
@@ -435,16 +432,18 @@ test.describe("文章排版", () => {
     const fencedCode = page.locator(".article-content pre code").first();
 
     const [paragraphFontSize, tableFontSize] = await Promise.all([
-      paragraph.evaluate(element => getComputedStyle(element).fontSize),
-      table.evaluate(element => getComputedStyle(element).fontSize),
+      paragraph.evaluate((element) => getComputedStyle(element).fontSize),
+      table.evaluate((element) => getComputedStyle(element).fontSize),
     ]);
     expect(tableFontSize).toBe(paragraphFontSize);
     await expectSemanticColor(inlineCode, "background-color", "accent");
     await expectSemanticColor(inlineCode, "color", "accent-foreground");
-    expect(await inlineCode.evaluate(element => ({
-      after: getComputedStyle(element, "::after").content,
-      before: getComputedStyle(element, "::before").content,
-    }))).toEqual({ after: "none", before: "none" });
+    expect(
+      await inlineCode.evaluate((element) => ({
+        after: getComputedStyle(element, "::after").content,
+        before: getComputedStyle(element, "::before").content,
+      })),
+    ).toEqual({ after: "none", before: "none" });
     expect(await hasSemanticColor(fencedCode, "background-color", "accent")).toBe(false);
   });
 });
@@ -478,7 +477,7 @@ test.describe("文章交互", () => {
 
   test("增强文章、搜索、主题、目录、复制和回顶", async ({ page, context }, testInfo) => {
     const pageErrors: string[] = [];
-    page.on("pageerror", error => pageErrors.push(error.message));
+    page.on("pageerror", (error) => pageErrors.push(error.message));
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/blog/guide/markdown-extensions");
     await expect(page.getByRole("heading", { level: 1, name: "使用 Markdown 扩展" })).toBeVisible();
@@ -491,7 +490,7 @@ test.describe("文章交互", () => {
       const article = document.querySelector<HTMLElement>("main.VPDoc article")!;
       const content = document.querySelector<HTMLElement>(".article-content")!;
       const paragraph = content.querySelector<HTMLElement>("p")!;
-      const outline = document.querySelector<HTMLElement>("aside[aria-label=\"文章目录\"]")!;
+      const outline = document.querySelector<HTMLElement>('aside[aria-label="文章目录"]')!;
       const articleBounds = article.getBoundingClientRect();
       const contentBounds = content.getBoundingClientRect();
       const outlineBounds = outline.getBoundingClientRect();
@@ -513,15 +512,17 @@ test.describe("文章交互", () => {
     const formulas = page.locator("mjx-container");
     await expect(formulas).toHaveCount(2);
     await expect(formulas.first()).toBeVisible();
-    const formulaLayout = await formulas.evaluateAll(containers => containers.map((container) => {
-      const svg = container.querySelector("svg");
-      const bounds = svg?.getBoundingClientRect();
-      return {
-        hasViewBox: svg?.getAttributeNames().includes("viewBox") ?? false,
-        width: bounds?.width ?? 0,
-        height: bounds?.height ?? 0,
-      };
-    }));
+    const formulaLayout = await formulas.evaluateAll((containers) =>
+      containers.map((container) => {
+        const svg = container.querySelector("svg");
+        const bounds = svg?.getBoundingClientRect();
+        return {
+          hasViewBox: svg?.getAttributeNames().includes("viewBox") ?? false,
+          width: bounds?.width ?? 0,
+          height: bounds?.height ?? 0,
+        };
+      }),
+    );
     expect(formulaLayout.every(({ hasViewBox }) => hasViewBox)).toBe(true);
     const formulasFit = formulaLayout.every(
       ({ width, height }) => width > 0 && width < 700 && height > 0 && height < 100,
@@ -539,11 +540,11 @@ test.describe("文章交互", () => {
     const headingAnchor = mathHeading.locator(".header-anchor");
     await mathHeading.hover();
     await expect(headingAnchor).toHaveCSS("opacity", "1");
-    expect(await headingAnchor.evaluate(anchor => getComputedStyle(anchor, "::before").content)).toContain("#");
+    expect(await headingAnchor.evaluate((anchor) => getComputedStyle(anchor, "::before").content)).toContain("#");
     await headingAnchor.focus();
     await page.keyboard.press("Enter");
     await expect.poll(() => page.evaluate(() => decodeURIComponent(location.hash))).toBe("#数学公式");
-    const headingTop = await mathHeading.evaluate(heading => heading.getBoundingClientRect().top);
+    const headingTop = await mathHeading.evaluate((heading) => heading.getBoundingClientRect().top);
     expect(headingTop).toBeGreaterThanOrEqual(90);
     expect(headingTop).toBeLessThanOrEqual(102);
     const remainingScrollDistance = await page.evaluate(
@@ -559,7 +560,9 @@ test.describe("文章交互", () => {
     await expect(predictableUrlLink).toHaveClass(/active/);
     await expect(toc.getByRole("link", { name: "普通图片" })).not.toHaveClass(/active/);
 
-    const articleMainPadding = await page.locator("main.VPDoc").evaluate(main => Number.parseFloat(getComputedStyle(main).paddingBottom));
+    const articleMainPadding = await page
+      .locator("main.VPDoc")
+      .evaluate((main) => Number.parseFloat(getComputedStyle(main).paddingBottom));
     expect(articleMainPadding).toBeLessThanOrEqual(64);
 
     const finalTocLink = toc.getByRole("link", { name: "普通图片" });
@@ -567,7 +570,7 @@ test.describe("文章交互", () => {
     await page.keyboard.press("Enter");
     await expect.poll(() => page.evaluate(() => decodeURIComponent(location.hash))).toBe("#普通图片");
     await expect(finalTocLink).toHaveClass(/active/);
-    expect(await toc.evaluate(element => element.scrollHeight - element.clientHeight)).toBeLessThanOrEqual(1);
+    expect(await toc.evaluate((element) => element.scrollHeight - element.clientHeight)).toBeLessThanOrEqual(1);
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     const backToTop = page.getByRole("button", { name: "返回顶部" });
@@ -582,7 +585,9 @@ test.describe("文章交互", () => {
     const search = page.getByRole("searchbox", { name: "搜索文章" });
     await expect(search).toBeFocused();
     await search.fill("站点配置");
-    await expect(page.getByRole("dialog", { name: "搜索文章" }).getByRole("link", { name: /配置站点信息/ })).toBeVisible();
+    await expect(
+      page.getByRole("dialog", { name: "搜索文章" }).getByRole("link", { name: /配置站点信息/ }),
+    ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(searchButton).toBeFocused();
 
@@ -613,23 +618,25 @@ test.describe("Markdown 图片布局", () => {
       await expect(grid.locator("img").first()).not.toHaveAttribute("alt", "");
     }
 
-    const r73Items = page.locator("[data-image-grid=\"r73\"] > p");
-    const boxes = await r73Items.evaluateAll(items => items.map((item) => {
-      const bounds = item.getBoundingClientRect();
-      return {
-        top: bounds.top,
-        right: bounds.right,
-        bottom: bounds.bottom,
-        width: bounds.width,
-        height: bounds.height,
-      };
-    }));
-    const landscapeBoxes = await page.locator("[data-image-grid=\"landscape\"] > p").evaluateAll(items => (
+    const r73Items = page.locator('[data-image-grid="r73"] > p');
+    const boxes = await r73Items.evaluateAll((items) =>
+      items.map((item) => {
+        const bounds = item.getBoundingClientRect();
+        return {
+          top: bounds.top,
+          right: bounds.right,
+          bottom: bounds.bottom,
+          width: bounds.width,
+          height: bounds.height,
+        };
+      }),
+    );
+    const landscapeBoxes = await page.locator('[data-image-grid="landscape"] > p').evaluateAll((items) =>
       items.map((item) => {
         const bounds = item.getBoundingClientRect();
         return { top: bounds.top, bottom: bounds.bottom, left: bounds.left, width: bounds.width };
-      })
-    ));
+      }),
+    );
     expect(landscapeBoxes).toHaveLength(4);
 
     if (testInfo.project.name === "desktop") {
@@ -639,14 +646,137 @@ test.describe("Markdown 图片布局", () => {
       expect(Math.abs(landscapeBoxes[2].top - landscapeBoxes[3].top)).toBeLessThanOrEqual(2);
       expect(landscapeBoxes[2].top).toBeGreaterThanOrEqual(landscapeBoxes[0].bottom);
       expect(Math.abs(landscapeBoxes[0].width - landscapeBoxes[2].width)).toBeLessThanOrEqual(2);
-    }
-    else {
+    } else {
       expect(Math.abs(boxes[0].width - boxes[1].width)).toBeLessThanOrEqual(2);
       expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom);
       for (let index = 1; index < landscapeBoxes.length; index += 1) {
         expect(landscapeBoxes[index].top).toBeGreaterThanOrEqual(landscapeBoxes[index - 1].bottom);
       }
     }
+  });
+});
+
+test.describe("Markdown 视频", () => {
+  test("语义化 video 容器渲染原生响应式播放器", async ({ page }) => {
+    await page.goto("/blog/guide/markdown-extensions");
+    const player = page.locator("[data-video-player] video");
+
+    await expect(player).toHaveCount(1);
+    await expect(player).toHaveAttribute("controls", "");
+    await expect(player).toHaveAttribute("playsinline", "");
+    await expect(player).toHaveAttribute("preload", "metadata");
+    await expect(player).toHaveAttribute("aria-label", "海边风景视频");
+    await expect(player).toHaveAttribute("src", /\/media\/live-photo-sample\.mp4$/);
+    await expect(player).toHaveAttribute("poster", /\/media\/live-photo-sample-poster\.png$/);
+    await expectNoOverflow(page);
+  });
+});
+
+test.describe("Markdown 音乐", () => {
+  test.skip(({ isMobile }) => isMobile, "全局播放器的拖动与桌面路由连续性在 desktop project 验证");
+
+  test("Motues 自动读取元数据并保持单一紧凑全局播放器", async ({ page }) => {
+    const resolverRequests: string[] = [];
+    await page.route("https://open.motues.top/music?**", async (route) => {
+      const type = new URL(route.request().url()).searchParams.get("type") ?? "";
+      resolverRequests.push(type);
+      const responses: Record<string, unknown> = {
+        details: {
+          id: 152392,
+          name: "讲不出再见",
+          artist: ["谭咏麟"],
+          album: "二十年白金畅销金曲全记录",
+          pic_id: "109951172024571270",
+          url_id: 152392,
+          lyric_id: 152392,
+          source: "netease",
+        },
+        cover: { url: "https://images.example.com/music-cover.jpg" },
+        url: { url: "https://media.example.com/resolved-song.mp3", size: 1024, br: 320 },
+      };
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(responses[type] ?? { error: "Unexpected type" }),
+      });
+    });
+    await page.route("https://images.example.com/music-cover.jpg", (route) =>
+      route.fulfill({ status: 200, contentType: "image/jpeg", body: "" }),
+    );
+    await page.route("https://media.example.com/resolved-song.mp3", (route) =>
+      route.fulfill({ status: 200, contentType: "audio/mpeg", body: "" }),
+    );
+
+    await page.goto("/blog/guide/markdown-extensions");
+    const card = page.locator('[data-music-card][data-music-resolver="motues-details"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("讲不出再见");
+    await expect(card).toContainText("谭咏麟 · 二十年白金畅销金曲全记录");
+    await expect(card.getByRole("img", { name: "讲不出再见的歌曲封面" })).toHaveAttribute(
+      "src",
+      "https://images.example.com/music-cover.jpg",
+    );
+    await expect(page.locator("audio[data-music-audio]")).toHaveCount(1);
+    expect(resolverRequests.filter((type) => type === "details")).toHaveLength(1);
+    expect(resolverRequests.filter((type) => type === "cover")).toHaveLength(1);
+    expect(resolverRequests).not.toContain("url");
+
+    await card.getByRole("button", { name: "播放《讲不出再见》" }).click();
+    const player = page.locator("[data-global-music-player]");
+    await expect(player).toBeVisible();
+    await expect(player).toHaveCSS("width", "80px");
+    await expect(player).toHaveCSS("height", "80px");
+    await expect(player.locator("[data-music-controls]")).toHaveCount(0);
+    await expect(player).toHaveAttribute("aria-label", /《讲不出再见》/);
+    const initialPosition = await player.boundingBox();
+    expect(initialPosition).not.toBeNull();
+    expect(initialPosition!.x).toBeCloseTo(24, 0);
+    expect(initialPosition!.y).toBeCloseTo(24, 0);
+    const closeButton = player.getByRole("button", { name: "关闭音乐播放器" });
+    const closeButtonPosition = await closeButton.boundingBox();
+    expect(closeButtonPosition).not.toBeNull();
+    await expect(closeButton.locator("[data-music-close-indicator]")).toHaveCSS("width", "16px");
+    await expect(closeButton.locator("[data-music-close-indicator]")).toHaveCSS("height", "16px");
+    expect(closeButtonPosition!.x + closeButtonPosition!.width / 2).toBeCloseTo(
+      initialPosition!.x + initialPosition!.width,
+      0,
+    );
+    expect(closeButtonPosition!.y + closeButtonPosition!.height / 2).toBeCloseTo(initialPosition!.y, 0);
+    await expect(page.locator("audio[data-music-audio]")).toHaveAttribute(
+      "src",
+      "https://media.example.com/resolved-song.mp3",
+    );
+    expect(resolverRequests.filter((type) => type === "url")).toHaveLength(1);
+    const record = player.locator("[data-music-record]");
+    await expect(record).toBeVisible();
+    await page.locator("audio[data-music-audio]").dispatchEvent("play");
+    await expect(record).toHaveCSS("animation-name", "spin");
+    await expect(record).toHaveCSS("animation-play-state", "running");
+    const pauseIcon = player.locator("[data-music-pause-icon]");
+    await expect(pauseIcon).toHaveCSS("opacity", "0");
+    await player.hover();
+    await expect(pauseIcon).toHaveCSS("opacity", "1");
+    await page.locator("audio[data-music-audio]").dispatchEvent("pause");
+    await expect(record).toHaveCSS("animation-play-state", "paused");
+
+    await page.locator('a[href="/blog/guide/image-layouts"]').first().click();
+    await expect(page).toHaveURL("/blog/guide/image-layouts");
+    await expect(player).toBeVisible();
+    await expect(player.getByRole("button", { name: /[播放暂停]《讲不出再见》/ })).toBeVisible();
+    await expect(page.locator("audio[data-music-audio]")).toHaveCount(1);
+
+    const before = await player.boundingBox();
+    await player.focus();
+    await expect(player).toBeFocused();
+    await page.keyboard.press("ArrowLeft");
+    const after = await player.boundingBox();
+    expect(before).not.toBeNull();
+    expect(after).not.toBeNull();
+    expect(after!.x).toBeLessThan(before!.x);
+
+    await closeButton.click();
+    await expect(player).toHaveCount(0);
+    await expect(page.locator("audio[data-music-audio]")).not.toHaveAttribute("src", /.+/);
   });
 });
 
@@ -665,7 +795,7 @@ test.describe("照片预览", () => {
     await expect(cover).toHaveCSS("border-bottom-right-radius", "0px");
     const fade = page.locator("[data-article-cover-fade]");
     await expect(fade).toBeVisible();
-    const fadeBackground = await fade.evaluate(element => getComputedStyle(element).backgroundImage);
+    const fadeBackground = await fade.evaluate((element) => getComputedStyle(element).backgroundImage);
     expect(fadeBackground).toContain("linear-gradient");
     const titleBounds = await page.getByRole("heading", { level: 1, name: "创建和组织文章" }).boundingBox();
     expect(titleBounds).not.toBeNull();
@@ -675,7 +805,10 @@ test.describe("照片预览", () => {
     await cover.click();
     const dialog = page.getByRole("dialog", { name: "照片预览" });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("img", { name: "创建和组织文章 封面" })).toHaveAttribute("src", /\/media\/live-photo-sample-poster\.png$/);
+    await expect(dialog.getByRole("img", { name: "创建和组织文章 封面" })).toHaveAttribute(
+      "src",
+      /\/media\/live-photo-sample-poster\.png$/,
+    );
     await dialog.getByRole("button", { name: "关闭照片预览" }).click();
     await expect(cover).toBeFocused();
   });
@@ -686,7 +819,9 @@ test.describe("照片预览", () => {
     await page.getByRole("button", { name: "搜索文章" }).click();
     const searchDialog = page.getByRole("dialog", { name: "搜索文章" });
     await expect(searchDialog).toBeVisible();
-    const searchMask = await searchDialog.evaluate(element => getComputedStyle(element, "::backdrop").backgroundColor);
+    const searchMask = await searchDialog.evaluate(
+      (element) => getComputedStyle(element, "::backdrop").backgroundColor,
+    );
     await page.keyboard.press("Escape");
 
     const ordinary = page.getByRole("button", { name: "预览图片：海边的横向风景" });
@@ -694,9 +829,20 @@ test.describe("照片预览", () => {
     const dialog = page.getByRole("dialog", { name: "照片预览" });
     await expect(dialog).toBeVisible();
     await expectSemanticColor(dialog, "background-color", "overlay");
-    expect(await dialog.evaluate(element => getComputedStyle(element).backgroundColor)).toBe(searchMask);
+    expect(await dialog.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(searchMask);
     await expectSemanticColor(dialog, "color", "overlay-foreground");
     await expect(dialog).toHaveClass(/backdrop:bg-transparent/);
+    await expect(dialog.getByRole("img", { name: "海边的横向风景" })).toBeVisible();
+    const articleImages = await page.locator("[data-photo-preview-scope] img[data-photo-preview]").count();
+    await expect(dialog.locator("[data-photo-preview-position]")).toContainText(`第 1 张，共 ${articleImages} 张`);
+    await expect(dialog.getByRole("button", { name: "上一张照片" })).toHaveCount(0);
+    await dialog.getByRole("button", { name: "下一张照片" }).click();
+    await expect(dialog.getByRole("img", { name: "山谷中的横向风景" })).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(dialog.getByRole("img", { name: "建筑与天空的横向风景" })).toBeVisible();
+    await page.keyboard.press("ArrowLeft");
+    await expect(dialog.getByRole("img", { name: "山谷中的横向风景" })).toBeVisible();
+    await dialog.getByRole("button", { name: "上一张照片" }).click();
     await expect(dialog.getByRole("img", { name: "海边的横向风景" })).toBeVisible();
     await expect(dialog.locator("[data-photo-preview-inspector]")).toHaveCount(0);
     await expect(page.locator("html")).toHaveClass(/overflow-hidden/);
@@ -735,22 +881,22 @@ test.describe("照片预览", () => {
       await page.mouse.move(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
       await page.mouse.wheel(0, -720);
       await expect(dialog.getByRole("button", { name: "重置照片缩放" })).toBeVisible();
-      const transformAfterZoom = await photo.evaluate(image => image.style.transform);
+      const transformAfterZoom = await photo.evaluate((image) => image.style.transform);
       expect(transformAfterZoom).toContain("scale(");
 
       await page.mouse.down();
       await page.mouse.move(bounds!.x + bounds!.width / 2 + 80, bounds!.y + bounds!.height / 2 + 60);
       await page.mouse.up();
-      const transformAfterDrag = await photo.evaluate(image => image.style.transform);
+      const transformAfterDrag = await photo.evaluate((image) => image.style.transform);
       expect(transformAfterDrag).not.toBe(transformAfterZoom);
 
       await dialog.getByRole("button", { name: "重置照片缩放" }).click();
       await expect(dialog.getByRole("button", { name: "重置照片缩放" })).toHaveCount(0);
-      expect(await photo.evaluate(image => image.style.transform)).toBe("");
+      expect(await photo.evaluate((image) => image.style.transform)).toBe("");
 
       await page.mouse.wheel(0, -720);
       await page.mouse.dblclick(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
-      expect(await photo.evaluate(image => image.style.transform)).toBe("");
+      expect(await photo.evaluate((image) => image.style.transform)).toBe("");
     }
 
     const inspectorToggle = dialog.getByRole("button", { name: "显示拍摄信息" });
@@ -764,7 +910,11 @@ test.describe("照片预览", () => {
     await expect(inspector).not.toHaveCSS("backdrop-filter", "none");
     const activeInspectorToggle = dialog.getByRole("button", { name: "隐藏拍摄信息" });
     await expectSemanticColor(activeInspectorToggle.locator("[data-photo-inspector-icon-fill]"), "fill", "primary");
-    await expectSemanticColor(activeInspectorToggle.locator("[data-photo-inspector-icon] svg").last(), "color", "primary-foreground");
+    await expectSemanticColor(
+      activeInspectorToggle.locator("[data-photo-inspector-icon] svg").last(),
+      "color",
+      "primary-foreground",
+    );
     await activeInspectorToggle.click();
     await expect(dialog.locator("[data-photo-preview-inspector]")).toHaveCount(0);
 
@@ -773,11 +923,16 @@ test.describe("照片预览", () => {
     await expect(ordinary).toBeFocused();
     await expect(page.locator("html")).not.toHaveClass(/overflow-hidden/);
 
-    const gridImage = page.getByRole("button", { name: "预览图片：建筑与天空的横向风景" });
+    const gridImage = page.getByRole("button", { name: "预览图片：右侧横向建筑" });
     await gridImage.focus();
     await page.keyboard.press("Enter");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("img", { name: "建筑与天空的横向风景" })).toHaveAttribute("src", /\/media\/live-photo-sample-poster\.png$/);
+    await expect(dialog.getByRole("img", { name: "右侧横向建筑" })).toHaveAttribute(
+      "src",
+      /\/media\/live-photo-sample-poster\.png$/,
+    );
+    await expect(dialog.getByRole("button", { name: "下一张照片" })).toHaveCount(0);
+    await expect(dialog.getByRole("button", { name: "上一张照片" })).toBeVisible();
     await dialog.getByRole("button", { name: "关闭照片预览" }).click();
     await expect(gridImage).toBeFocused();
     await expectNoOverflow(page);
@@ -824,15 +979,15 @@ test.describe("照片预览", () => {
       };
     });
     expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth);
-    if (testInfo.project.name === "desktop")
-      expect(layout.detailsLeft).toBeGreaterThanOrEqual(layout.stageRight - 1);
-    else
-      expect(layout.detailsTop).toBeGreaterThanOrEqual(layout.stageBottom - 1);
+    if (testInfo.project.name === "desktop") expect(layout.detailsLeft).toBeGreaterThanOrEqual(layout.stageRight - 1);
+    else expect(layout.detailsTop).toBeGreaterThanOrEqual(layout.stageBottom - 1);
 
     await page.keyboard.press("Escape");
     await expect(dialog).not.toBeVisible();
     await expect(poster).toBeFocused();
-    await expect(page.getByRole("button", { name: "播放 Live Photo：Android Motion Photo 演示" }).first()).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "播放 Live Photo：Android Motion Photo 演示" }).first(),
+    ).toBeVisible();
   });
 
   test("Live Photo 可在照片预览内按需播放并释放 Android Blob", async ({ page }) => {
@@ -847,38 +1002,57 @@ test.describe("照片预览", () => {
     const mp4Video = dialog.locator("video");
     await expect(mp4Video).toBeVisible();
     await expect(mp4Video).not.toHaveAttribute("controls", "");
-    await expect.poll(() => mp4Video.evaluate(element => !(element as HTMLVideoElement).paused)).toBe(true);
-    await expect.poll(() => dialog.evaluate((element) => {
-      const video = element.querySelector("video")?.getBoundingClientRect();
-      const control = element.querySelector<HTMLButtonElement>("button[aria-label='停止 Live Photo']")?.getBoundingClientRect();
-      return Boolean(video && control
-        && control.left >= video.left
-        && control.top >= video.top
-        && control.right <= video.right
-        && control.bottom <= video.bottom);
-    })).toBe(true);
+    await expect.poll(() => mp4Video.evaluate((element) => !(element as HTMLVideoElement).paused)).toBe(true);
+    await expect
+      .poll(() =>
+        dialog.evaluate((element) => {
+          const video = element.querySelector("video")?.getBoundingClientRect();
+          const control = element
+            .querySelector<HTMLButtonElement>("button[aria-label='停止 Live Photo']")
+            ?.getBoundingClientRect();
+          return Boolean(
+            video &&
+            control &&
+            control.left >= video.left &&
+            control.top >= video.top &&
+            control.right <= video.right &&
+            control.bottom <= video.bottom,
+          );
+        }),
+      )
+      .toBe(true);
     await dialog.getByRole("button", { name: "显示拍摄信息" }).click();
-    await expect.poll(() => dialog.evaluate((element) => {
-      const video = element.querySelector("video")?.getBoundingClientRect();
-      const control = element.querySelector<HTMLButtonElement>("button[aria-label='停止 Live Photo']")?.getBoundingClientRect();
-      return Boolean(video && control
-        && control.left >= video.left
-        && control.top >= video.top
-        && control.right <= video.right
-        && control.bottom <= video.bottom);
-    })).toBe(true);
+    await expect
+      .poll(() =>
+        dialog.evaluate((element) => {
+          const video = element.querySelector("video")?.getBoundingClientRect();
+          const control = element
+            .querySelector<HTMLButtonElement>("button[aria-label='停止 Live Photo']")
+            ?.getBoundingClientRect();
+          return Boolean(
+            video &&
+            control &&
+            control.left >= video.left &&
+            control.top >= video.top &&
+            control.right <= video.right &&
+            control.bottom <= video.bottom,
+          );
+        }),
+      )
+      .toBe(true);
     await dialog.getByRole("button", { name: "隐藏拍摄信息" }).click();
     await dialog.getByRole("button", { name: "停止 Live Photo" }).click();
     await expect(mp4Video).toHaveCount(0);
     await dialog.getByRole("button", { name: "关闭照片预览" }).click();
 
-    const androidFetchesBeforePlayback = (await readLivePhotoProbe(page)).fetches.filter(
-      url => url.includes("/live-images/android-motion-photo.jpg"),
+    const androidFetchesBeforePlayback = (await readLivePhotoProbe(page)).fetches.filter((url) =>
+      url.includes("/live-images/android-motion-photo.jpg"),
     ).length;
     const androidPoster = page.getByRole("button", { name: "预览图片：Android Motion Photo 演示" }).first();
     await androidPoster.click();
-    expect((await readLivePhotoProbe(page)).fetches.filter(url => url.includes("/live-images/android-motion-photo.jpg")))
-      .toHaveLength(androidFetchesBeforePlayback);
+    expect(
+      (await readLivePhotoProbe(page)).fetches.filter((url) => url.includes("/live-images/android-motion-photo.jpg")),
+    ).toHaveLength(androidFetchesBeforePlayback);
 
     const androidPlay = dialog.getByRole("button", { name: "播放 Live Photo：Android Motion Photo 演示" });
     await androidPlay.click();
@@ -886,20 +1060,22 @@ test.describe("照片预览", () => {
     await expect(androidVideo).toBeVisible();
     await expect(androidVideo).toHaveAttribute("src", /^blob:/);
     await expect(androidVideo).not.toHaveAttribute("controls", "");
-    await expect.poll(() => androidVideo.evaluate(element => !(element as HTMLVideoElement).paused)).toBe(true);
+    await expect.poll(() => androidVideo.evaluate((element) => !(element as HTMLVideoElement).paused)).toBe(true);
 
     const firstSource = await androidVideo.getAttribute("src");
     let probe = await readLivePhotoProbe(page);
-    expect(probe.fetches.filter(url => url.includes("/live-images/android-motion-photo.jpg")))
-      .toHaveLength(androidFetchesBeforePlayback + 1);
+    expect(probe.fetches.filter((url) => url.includes("/live-images/android-motion-photo.jpg"))).toHaveLength(
+      androidFetchesBeforePlayback + 1,
+    );
 
     await dialog.getByRole("button", { name: "停止 Live Photo" }).click();
     await expect(androidVideo).toHaveCount(0);
     await androidPlay.click();
     await expect(androidVideo).toHaveAttribute("src", firstSource!);
     probe = await readLivePhotoProbe(page);
-    expect(probe.fetches.filter(url => url.includes("/live-images/android-motion-photo.jpg")))
-      .toHaveLength(androidFetchesBeforePlayback + 1);
+    expect(probe.fetches.filter((url) => url.includes("/live-images/android-motion-photo.jpg"))).toHaveLength(
+      androidFetchesBeforePlayback + 1,
+    );
 
     await dialog.getByRole("button", { name: "关闭照片预览" }).click();
     await expect(dialog).not.toBeVisible();
@@ -910,14 +1086,16 @@ test.describe("照片预览", () => {
 test.describe("VitePress Markdown 扩展", () => {
   test("官方容器、代码组、代码行状态与图片懒加载可用", async ({ page }) => {
     const pageErrors: string[] = [];
-    page.on("pageerror", error => pageErrors.push(error.message));
+    page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.goto("/blog/guide/markdown-extensions");
 
     for (const type of ["info", "tip", "warning", "danger", "details"]) {
       const current = page.locator(`.article-content .custom-block.${type}:not(.github-alert)`).first();
       await expect(current).toBeVisible();
       await expect(current).toHaveCSS("border-left-width", "4px");
-      expect(await current.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+      expect(await current.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+        "rgba(0, 0, 0, 0)",
+      );
     }
 
     const defaultTitles = {
@@ -928,7 +1106,10 @@ test.describe("VitePress Markdown 扩展", () => {
     };
     for (const [type, title] of Object.entries(defaultTitles)) {
       await expect(
-        page.locator(`.article-content .custom-block.${type}:not(.github-alert)`).first().locator(".custom-block-title"),
+        page
+          .locator(`.article-content .custom-block.${type}:not(.github-alert)`)
+          .first()
+          .locator(".custom-block-title"),
       ).toHaveText(title);
     }
 
@@ -939,8 +1120,12 @@ test.describe("VitePress Markdown 扩展", () => {
     await expect(details).toHaveAttribute("open", "");
     await expect(details.getByText("这是浏览器原生的可展开内容，默认保持收起。")).toBeVisible();
 
-    await expect(page.locator(".article-content .custom-block.danger:not(.github-alert)").nth(1).locator(".custom-block-title")).toHaveText("停止");
-    await expect(page.locator(".article-content details.custom-block.details").nth(1).locator("summary")).toHaveText("点击查看代码");
+    await expect(
+      page.locator(".article-content .custom-block.danger:not(.github-alert)").nth(1).locator(".custom-block-title"),
+    ).toHaveText("停止");
+    await expect(page.locator(".article-content details.custom-block.details").nth(1).locator("summary")).toHaveText(
+      "点击查看代码",
+    );
 
     for (const type of ["note", "tip", "important", "warning", "caution"]) {
       const alert = page.locator(`.article-content .github-alert.${type}`);
@@ -958,7 +1143,7 @@ test.describe("VitePress Markdown 扩展", () => {
     await expect(blocks.nth(0)).toBeVisible();
     await expect(blocks.nth(1)).toBeHidden();
 
-    await group.locator("label[data-title=\"npm\"]").click();
+    await group.locator('label[data-title="npm"]').click();
     await expect(npm).toBeChecked();
     await expect(blocks.nth(0)).toBeHidden();
     await expect(blocks.nth(1)).toBeVisible();
@@ -975,26 +1160,27 @@ test.describe("VitePress Markdown 扩展", () => {
     await expect(warning).toBeVisible();
     await expect(focused).toHaveCSS("opacity", "0.7");
     await expect(stateBlock.locator(".line-number")).toHaveText(["1", "2", "3", "4", "5", "6"]);
-    expect(await stateBlock.evaluate((element) => {
-      const code = element.querySelector("code");
-      const lineNumbers = element.querySelector(".line-numbers-wrapper");
-      if (!code || !lineNumbers)
-        return Number.POSITIVE_INFINITY;
-      const codeLineHeight = Number.parseFloat(getComputedStyle(code).lineHeight);
-      const lineNumberHeight = Number.parseFloat(getComputedStyle(lineNumbers).lineHeight);
-      return Math.abs(codeLineHeight - lineNumberHeight);
-    })).toBeLessThanOrEqual(1);
-    expect(await diffAdd.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
-    expect(await error.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
-    expect(await warning.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    expect(
+      await stateBlock.evaluate((element) => {
+        const code = element.querySelector("code");
+        const lineNumbers = element.querySelector(".line-numbers-wrapper");
+        if (!code || !lineNumbers) return Number.POSITIVE_INFINITY;
+        const codeLineHeight = Number.parseFloat(getComputedStyle(code).lineHeight);
+        const lineNumberHeight = Number.parseFloat(getComputedStyle(lineNumbers).lineHeight);
+        return Math.abs(codeLineHeight - lineNumberHeight);
+      }),
+    ).toBeLessThanOrEqual(1);
+    expect(await diffAdd.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    expect(await error.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    expect(await warning.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
 
     const image = page.getByRole("button", { name: "预览图片：Markdown 图片演示" });
     await expect(image).toHaveAttribute("loading", "lazy");
 
-    const lightContainerBackground = await container.evaluate(element => getComputedStyle(element).backgroundColor);
+    const lightContainerBackground = await container.evaluate((element) => getComputedStyle(element).backgroundColor);
     await page.getByRole("button", { name: /切换到.*主题/ }).click();
     await expect(page.locator("html")).toHaveClass(/dark/);
-    const darkContainerBackground = await container.evaluate(element => getComputedStyle(element).backgroundColor);
+    const darkContainerBackground = await container.evaluate((element) => getComputedStyle(element).backgroundColor);
     expect(darkContainerBackground).not.toBe("rgba(0, 0, 0, 0)");
     expect(darkContainerBackground).not.toBe(lightContainerBackground);
 
@@ -1007,8 +1193,7 @@ test.describe("Live Photo", () => {
   test("左上角标识按需在原位置播放视频", async ({ page }) => {
     const videoRequests: string[] = [];
     page.on("request", (request) => {
-      if (request.url().includes("live-photo-sample.mp4"))
-        videoRequests.push(request.url());
+      if (request.url().includes("live-photo-sample.mp4")) videoRequests.push(request.url());
     });
 
     await page.goto("/blog/guide/live-photo");
@@ -1028,7 +1213,7 @@ test.describe("Live Photo", () => {
     await expect(video).toHaveAttribute("preload", "metadata");
     await expect(video).not.toHaveAttribute("controls", "");
     await expect.poll(() => videoRequests.length).toBeGreaterThan(0);
-    await expect.poll(() => video.evaluate(element => !(element as HTMLVideoElement).paused)).toBe(true);
+    await expect.poll(() => video.evaluate((element) => !(element as HTMLVideoElement).paused)).toBe(true);
 
     const stop = page.getByRole("button", { name: "停止 Live Photo" });
     await expect(stop).toHaveClass(/bg-popover\/90/);
@@ -1046,16 +1231,14 @@ test.describe("Live Photo", () => {
     await installLivePhotoProbe(page);
     await page.goto("/blog/guide/live-photo");
 
-    const samples = [
-      { alt: "Android Motion Photo 演示", source: "/live-images/android-motion-photo.jpg" },
-    ];
+    const samples = [{ alt: "Android Motion Photo 演示", source: "/live-images/android-motion-photo.jpg" }];
 
-    await expect(page.locator("[data-live-photo-mode=\"android\"]")).toHaveCount(1);
+    await expect(page.locator('[data-live-photo-mode="android"]')).toHaveCount(1);
     expect((await readLivePhotoProbe(page)).fetches).toHaveLength(0);
     expect((await readLivePhotoProbe(page)).videoBlobUrls).toHaveLength(0);
 
     for (const [index, sample] of samples.entries()) {
-      const figure = page.locator("[data-live-photo-mode=\"android\"]").nth(index);
+      const figure = page.locator('[data-live-photo-mode="android"]').nth(index);
       const play = figure.getByRole("button", { name: `播放 Live Photo：${sample.alt}` });
       await expect(play).toBeVisible();
       await play.click();
@@ -1064,24 +1247,24 @@ test.describe("Live Photo", () => {
       await expect(video).toBeVisible();
       await expect(video).not.toHaveAttribute("controls", "");
       await expect(video).toHaveAttribute("src", /^blob:/);
-      await expect.poll(() => video.evaluate(element => !(element as HTMLVideoElement).paused)).toBe(true);
+      await expect.poll(() => video.evaluate((element) => !(element as HTMLVideoElement).paused)).toBe(true);
 
       const firstSource = await video.getAttribute("src");
       let probe = await readLivePhotoProbe(page);
-      expect(probe.fetches.filter(url => url.includes(sample.source))).toHaveLength(1);
+      expect(probe.fetches.filter((url) => url.includes(sample.source))).toHaveLength(1);
 
       await figure.getByRole("button", { name: "停止 Live Photo" }).click();
       await expect(video).toHaveCount(0);
       await play.click();
       await expect(video).toHaveAttribute("src", firstSource!);
       probe = await readLivePhotoProbe(page);
-      expect(probe.fetches.filter(url => url.includes(sample.source))).toHaveLength(1);
+      expect(probe.fetches.filter((url) => url.includes(sample.source))).toHaveLength(1);
       await figure.getByRole("button", { name: "停止 Live Photo" }).click();
     }
 
     const createdUrls = (await readLivePhotoProbe(page)).videoBlobUrls;
     expect(createdUrls).toHaveLength(1);
-    await page.locator("a[href=\"/\"]").first().click();
+    await page.locator('a[href="/"]').first().click();
     await expect(page).toHaveURL("/");
     const revokedUrls = (await readLivePhotoProbe(page)).revokedUrls;
     expect(revokedUrls).toEqual(expect.arrayContaining(createdUrls));
@@ -1095,7 +1278,7 @@ test.describe("Live Photo", () => {
         await route.fulfill({
           status: 200,
           contentType: "image/jpeg",
-          body: Buffer.from([0xFF, 0xD8, 0xFF, 0xD9]),
+          body: Buffer.from([0xff, 0xd8, 0xff, 0xd9]),
         });
         return;
       }
@@ -1103,7 +1286,7 @@ test.describe("Live Photo", () => {
     });
 
     await page.goto("/blog/guide/live-photo");
-    const figure = page.locator("[data-live-photo-mode=\"android\"]").first();
+    const figure = page.locator('[data-live-photo-mode="android"]').first();
     const play = figure.getByRole("button", { name: "播放 Live Photo：Android Motion Photo 演示" });
     await play.click();
 

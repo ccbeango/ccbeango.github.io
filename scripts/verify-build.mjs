@@ -31,38 +31,43 @@ const requiredFiles = [
   "favicon.svg",
 ];
 
-await Promise.all(requiredFiles.map(file => access(join(dist, file))));
+await Promise.all(requiredFiles.map((file) => access(join(dist, file))));
 
 async function walk(directory) {
-  const nested = await Promise.all((await readdir(directory, { withFileTypes: true })).map(
-    entry => entry.isDirectory()
-      ? walk(join(directory, entry.name))
-      : [join(directory, entry.name)],
-  ));
+  const nested = await Promise.all(
+    (await readdir(directory, { withFileTypes: true })).map((entry) =>
+      entry.isDirectory() ? walk(join(directory, entry.name)) : [join(directory, entry.name)],
+    ),
+  );
   return nested.flat();
 }
 const files = await walk(dist);
-const publicTextFiles = files.filter(file => /\.(?:html|xml|json|txt)$/.test(file));
-const publicText = (await Promise.all(publicTextFiles.map(file => readFile(file, "utf8")))).join("\n");
+const publicTextFiles = files.filter((file) => /\.(?:html|xml|json|txt)$/.test(file));
+const publicText = (await Promise.all(publicTextFiles.map((file) => readFile(file, "utf8")))).join("\n");
 
 function assert(condition, message) {
-  if (!condition)
-    throw new Error(message);
+  if (!condition) throw new Error(message);
 }
 
-assert(!files.some(file => relative(dist, file).replace(/\\/g, "/").startsWith("posts/")), "构建产物不得暴露 /posts 原稿路由");
+assert(
+  !files.some((file) => relative(dist, file).replace(/\\/g, "/").startsWith("posts/")),
+  "构建产物不得暴露 /posts 原稿路由",
+);
 assert(!publicText.includes("draft-preview") && !publicText.includes("草稿预览示例"), "公开产物不得包含草稿");
 
 const article = await readFile(join(dist, "blog", "guide", "markdown-extensions.html"), "utf8");
 assert(article.includes("<mjx-container"), "文章必须渲染数学公式");
 assert(article.includes("language-ts"), "文章必须包含 Shiki 代码块");
 assert(!article.includes("title: 使用 Markdown 扩展"), "文章正文不得显示 frontmatter");
-for (const token of ["rel=\"canonical\"", "property=\"og:title\"", "name=\"twitter:card\"", "rel=\"manifest\""]) {
+for (const token of ['rel="canonical"', 'property="og:title"', 'name="twitter:card"', 'rel="manifest"']) {
   assert(article.includes(token), `文章缺少元数据：${token}`);
 }
 
 const sitemap = await readFile(join(dist, "sitemap.xml"), "utf8");
-assert(sitemap.includes("https://") && sitemap.includes("/blog/guide/getting-started"), "sitemap 必须包含绝对多段文章地址");
+assert(
+  sitemap.includes("https://") && sitemap.includes("/blog/guide/getting-started"),
+  "sitemap 必须包含绝对多段文章地址",
+);
 assert(!sitemap.includes("/posts/") && !sitemap.includes("/404"), "sitemap 不得包含原稿或 404");
 
 const robots = await readFile(join(dist, "robots.txt"), "utf8");

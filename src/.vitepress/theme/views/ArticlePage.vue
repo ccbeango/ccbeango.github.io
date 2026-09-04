@@ -27,7 +27,10 @@ onContentUpdated(enhanceArticleContent);
 </script>
 
 <template>
-  <main class="VPDoc mx-auto w-full max-w-layout px-page-gutter sm:px-6">
+  <main
+    class="VPDoc mx-auto w-full max-w-layout px-page-gutter sm:px-6"
+    data-photo-preview-scope
+  >
     <div class="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,52rem)_minmax(10rem,1fr)] xl:gap-6">
       <SeriesSidebar />
       <TableOfContents />
@@ -46,7 +49,7 @@ onContentUpdated(enhanceArticleContent);
             data-photo-preview
             role="button"
             tabindex="0"
-          >
+          />
           <span
             class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-b from-transparent to-background"
             aria-hidden="true"
@@ -70,18 +73,27 @@ onContentUpdated(enhanceArticleContent);
             <time
               class="whitespace-nowrap"
               :datetime="post.date"
-            >{{ formatDate(post.date) }}</time>
+            >
+              {{ formatDate(post.date) }}
+            </time>
             <span class="inline-flex items-center gap-2 whitespace-nowrap">
-              <span aria-hidden="true">·</span>{{ post.wordCount }} 字
+              <span aria-hidden="true">·</span>
+              {{ post.wordCount }} 字
             </span>
             <span
               v-if="post.updated"
               class="inline-flex items-center gap-2 whitespace-nowrap"
-            ><span aria-hidden="true">·</span>更新于 {{ formatDate(post.updated) }}</span>
+            >
+              <span aria-hidden="true">·</span>
+              更新于 {{ formatDate(post.updated) }}
+            </span>
             <span
               v-if="post.readingTime"
               class="inline-flex items-center gap-2 whitespace-nowrap"
-            ><span aria-hidden="true">·</span>约 {{ post.readingTime }} 分钟</span>
+            >
+              <span aria-hidden="true">·</span>
+              约 {{ post.readingTime }} 分钟
+            </span>
           </p>
         </header>
         <div class="article-content prose">
@@ -97,7 +109,9 @@ onContentUpdated(enhanceArticleContent);
             :key="tag"
             class="rounded-sm underline decoration-border underline-offset-4 transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
             :href="withBase(`/tags/${tagSlug(tag)}`)"
-          >#{{ tag }}</a>
+          >
+            #{{ tag }}
+          </a>
         </footer>
         <GiscusComments />
       </article>

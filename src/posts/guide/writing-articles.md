@@ -58,20 +58,20 @@ canonical: https://example.com/original-article
 ---
 ```
 
-| 字段 | 必填 | 说明 |
-| --- | --- | --- |
-| `title` | 是 | 非空文章标题 |
-| `date` | 是 | 可解析日期，建议使用 `YYYY-MM-DD` |
-| `updated` | 否 | 最近更新日期 |
-| `summary` | 否 | 首页、列表、搜索和 feed 摘要 |
-| `description` | 否 | SEO description，省略时回退到 `summary` |
-| `keywords` | 否 | SEO 与搜索关键词数组 |
-| `featured` | 否 | 是否进入首页“推荐阅读”，默认 `false` |
-| `series` | 否 | 自动系列侧栏信息 |
-| `tags` | 否 | 标签数组，会规范化、去重和计数 |
-| `draft` | 否 | 草稿状态，默认 `false` |
-| `cover` | 否 | `src/public` 下资源的根路径地址 |
-| `canonical` | 否 | 内容另有首发地址时使用的完整 URL |
+| 字段          | 必填 | 说明                                    |
+| ------------- | ---- | --------------------------------------- |
+| `title`       | 是   | 非空文章标题                            |
+| `date`        | 是   | 可解析日期，建议使用 `YYYY-MM-DD`       |
+| `updated`     | 否   | 最近更新日期                            |
+| `summary`     | 否   | 首页、列表、搜索和 feed 摘要            |
+| `description` | 否   | SEO description，省略时回退到 `summary` |
+| `keywords`    | 否   | SEO 与搜索关键词数组                    |
+| `featured`    | 否   | 是否进入首页“推荐阅读”，默认 `false`    |
+| `series`      | 否   | 自动系列侧栏信息                        |
+| `tags`        | 否   | 标签数组，会规范化、去重和计数          |
+| `draft`       | 否   | 草稿状态，默认 `false`                  |
+| `cover`       | 否   | `src/public` 下资源的根路径地址         |
+| `canonical`   | 否   | 内容另有首发地址时使用的完整 URL        |
 
 无效日期、错误字段类型或重复 slug 会让配置加载失败，并在错误中指出对应文件和字段。
 

@@ -2,9 +2,10 @@
 
 - [x] 1.1 建立 VitePress `2.0.0-alpha.19`、Vue 3、TypeScript 和 pnpm workspace 工程，提供开发、严格生产构建、固定根站点本地构建、预览与检查命令
 - [x] 1.2 以 `src` 为 VitePress 根目录，组织配置、数据、Markdown 插件、自定义主题、文章和公共资源
-- [x] 1.3 配置 ESLint Flat Config、`@antfu/eslint-config` 和 `eslint-plugin-better-tailwindcss`，关闭外部 formatter，统一 LF、120 字符、Vue 属性换行、canonical class 与官方 class order，不引入 Prettier
-- [x] 1.4 统一 VS Code 保存格式化与 `Alt+Shift+F` 到 ESLint 工作流
-- [x] 1.5 建立 authored styles 审计，仅允许文章页 scoped Markdown 适配层，并拒绝其他普通 UI CSS、Vue `<style>`、内联样式、动态 class、内置色板、硬编码颜色和不受允许的 arbitrary value
+- [x] 1.3 以 ESLint Flat Config 组合 JavaScript、TypeScript、Vue 和 Markdown 官方推荐配置，使用 `eslint-plugin-better-tailwindcss` 检查 canonical class，并以 Prettier 和官方 Tailwind 插件统一 120 字符宽度、Vue 属性与内容换行、Markdown 段落换行及 class order
+- [x] 1.4 统一 VS Code 保存格式化、`Alt+Shift+F` 与 `pnpm format` 到 Prettier，并在保存后独立执行 ESLint 安全修复
+- [x] 1.5 建立 authored styles 审计，允许必要且遵循设计令牌的组件 scoped CSS，并拒绝额外普通 UI CSS、全局选择器、非 scoped 或多个 style block、内联样式、动态 class、内置色板、硬编码颜色和不受允许的 arbitrary value
+- [x] 1.6 使用 `simple-git-hooks` 与 `lint-staged` 在 pre-commit 校验暂存文件的 Prettier、ESLint 和相关样式边界，不自动修复且不执行耗时构建
 
 ## 2. 内容模型与路由
 
@@ -17,7 +18,7 @@
 ## 3. 自定义主题与设计系统
 
 - [x] 3.1 实现首页、列表、文章、标签、归档、404、页头、页脚、全局纵向 flex 页面骨架、支持点击外部关闭的桌面下拉导航和移动嵌套导航
-- [x] 3.2 使用 Tailwind CSS 4 作为主要 authored UI styles 管线，并通过采用标准 CSS Nesting、无需额外 nesting 插件或 PostCSS 配置的文章页 scoped CSS 集中适配 VitePress Markdown markup
+- [x] 3.2 使用 Tailwind CSS 4 作为主要 authored UI styles 管线，并允许在 utility 无法清晰表达时使用采用标准 CSS Nesting、无需额外 nesting 插件或 PostCSS 配置的组件 scoped CSS
 - [x] 3.3 建立仅使用 `oklab()` 的语义颜色与 `-foreground` 配对，使用根节点同名 token 覆盖实现 class-based 暗色模式
 - [x] 3.4 集中定义并使用字体、字重、字号与行高、间距、控件尺寸、圆角、容器、断点、层级、阴影、模糊、媒体比例和动效令牌
 - [x] 3.5 通过 `@bean-blog/lxgw-wenkai-lite-webfont` 子包自托管 Regular 400 与 Medium 500，提供官方资产校验、Python/FontTools 更新脚本和 unicode-range WOFF2
@@ -45,6 +46,10 @@
 - [x] 5.6 使用 `exifr` 按需缓存非 GPS 拍摄参数，并实现宽屏右侧与窄屏下方的响应式信息面板
 - [x] 5.7 在正文与预览中实现图片左上角 Live 徽记与 `LIVE` 播放入口、激活前无视频请求或解析、并发去重、Blob 复用与释放、失败回退和无原生 controls 播放
 - [x] 5.8 统一照片预览右上角操作为直接位于 mask 上的无背景 Lucide icon，并复用全局 overlay、foreground、primary 与 ring 语义颜色
+- [x] 5.9 将当前文章的封面、普通图片、图片网格和 Live Photo 首帧组成有序预览图片集，支持两侧 icon、键盘方向键、边界按钮隐藏和切图状态清理
+- [x] 5.10 实现 `::: video <source>` 通用视频容器，支持可选 Markdown poster、站点 base path、完整远程 URL、原生 controls、移动端内联播放和严格输入校验
+- [x] 5.11 实现 `::: music` 音乐卡片，支持远程直链手工信息、Motues details 自动歌曲名/歌手/专辑/封面、按需音频 URL、文章内进度控制、单一跨路由且默认位于左上角的 `80×80px` 唱片播放器、播放旋转、hover 暂停控制、语义色小型外凸关闭、边界内拖动、并发保护和失败状态
+- [x] 5.12 实现正文内包含标准 Markdown 链接与可选纯文本说明的 `::: link-card` 文章引用容器，支持站点 base path、HTTP/HTTPS 外链和严格输入校验
 
 ## 6. 搜索与发布附属物
 
@@ -56,9 +61,10 @@
 
 ## 7. 文档、测试与发布
 
-- [x] 7.1 将快速开始、完整站点与 VitePress 配置说明、含真实封面示例的文章写作、Markdown 扩展、图片布局、Live Photo 和部署说明整理为 `src/posts/guide` 正式系列文章，并复用唯一通用演示图片
+- [x] 7.1 将快速开始与工程规范、完整站点与 VitePress 配置说明、含真实封面示例的文章写作、Markdown 扩展、图片布局、Live Photo 和部署说明整理为 `src/posts/guide` 正式系列文章，并复用唯一通用演示图片
 - [x] 7.2 精简 README 为仓库入口和手册索引，移除重复 `docs`、无说明价值的测试文章与冗余 public 演示资源
 - [x] 7.3 使用 Vitest 覆盖内容转换、系列 sidebar、Markdown 容器、EXIF、主题令牌和配置，并以 `live-images/android-motion-photo.jpg` 覆盖真实 Android Motion Photo 定位和厂商 trailer 保留
 - [x] 7.4 使用静态产物检查与 Playwright 覆盖公开路由、直接访问与客户端导航 404、SEO、feed、桌面和移动布局、导航、目录、搜索、媒体、主题和无障碍
 - [x] 7.5 让站内手册真实示例同时承担 renderer 与浏览器回归，确保 typecheck 显式覆盖隐藏的 `src/.vitepress` 配置与主题目录，并执行 lint、样式审计、单元测试与 OpenSpec strict validation
-- [ ] 7.6 填入正式站点身份、规范域名、社交链接和可选 Giscus 参数，使用目标 `SITE_URL` / `SITE_BASE` 完成生产检查、预览与发布
+- [x] 7.6 将 `check:build` 作为不依赖浏览器的 GitHub Pages 部署门禁，并将完整 Playwright 回归保留为本地按需执行的 `check`
+- [ ] 7.7 填入正式站点身份、规范域名、社交链接和可选 Giscus 参数，使用目标 `SITE_URL` / `SITE_BASE` 完成生产检查、预览与发布

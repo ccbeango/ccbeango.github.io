@@ -20,7 +20,8 @@ const pageHref = (page: number) => page === 1 ? "/blog" : `/blog/page/${page}`;
       <ArrowLeft
         :size="17"
         aria-hidden="true"
-      /> 上一页
+      />
+      上一页
     </a>
     <span
       v-else
@@ -33,7 +34,8 @@ const pageHref = (page: number) => page === 1 ? "/blog" : `/blog/page/${page}`;
       class="inline-flex h-control items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
       :href="withBase(pageHref(props.page + 1))"
     >
-      下一页 <ArrowRight
+      下一页
+      <ArrowRight
         :size="17"
         aria-hidden="true"
       />

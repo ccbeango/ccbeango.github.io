@@ -14,15 +14,9 @@ const taggedPosts = computed(() => posts.filter(post => post.tags.some(tag => ta
 <template>
   <main class="mx-auto w-full max-w-content px-page-gutter pt-12 pb-8 sm:px-page-gutter-wide sm:pt-16">
     <header class="mb-10">
-      <p class="text-xs font-semibold text-muted-foreground uppercase">
-        Topic
-      </p>
-      <h1 class="mt-2 text-3xl font-bold wrap-break-word sm:text-4xl">
-        # {{ tagName }}
-      </h1>
-      <p class="mt-4 text-muted-foreground">
-        {{ taggedPosts.length }} 篇文章
-      </p>
+      <p class="text-xs font-semibold text-muted-foreground uppercase">Topic</p>
+      <h1 class="mt-2 text-3xl font-bold wrap-break-word sm:text-4xl"># {{ tagName }}</h1>
+      <p class="mt-4 text-muted-foreground">{{ taggedPosts.length }} 篇文章</p>
     </header>
     <PostList
       :posts="taggedPosts"

@@ -14,7 +14,9 @@ import { siteConfig } from "../../site.config";
         href="https://vitepress.dev/"
         target="_blank"
         rel="noreferrer"
-      >VitePress</a>
+      >
+        VitePress
+      </a>
     </span>
   </footer>
 </template>

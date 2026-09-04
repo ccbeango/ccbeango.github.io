@@ -15,15 +15,9 @@ const pagination = computed(() => paginatePosts(posts, page.value, siteConfig.si
 <template>
   <main class="mx-auto w-full max-w-content px-page-gutter pt-12 pb-8 sm:px-page-gutter-wide sm:pt-16">
     <header class="mb-10">
-      <p class="text-xs font-semibold text-muted-foreground uppercase">
-        Writing
-      </p>
-      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">
-        全部文章
-      </h1>
-      <p class="mt-4 leading-copy text-muted-foreground">
-        共 {{ posts.length }} 篇，按发布时间从新到旧排列。
-      </p>
+      <p class="text-xs font-semibold text-muted-foreground uppercase">Writing</p>
+      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">全部文章</h1>
+      <p class="mt-4 leading-copy text-muted-foreground">共 {{ posts.length }} 篇，按发布时间从新到旧排列。</p>
     </header>
     <PostList :posts="pagination.items" />
     <PaginationNav

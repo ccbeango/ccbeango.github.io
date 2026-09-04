@@ -13,7 +13,7 @@ export async function generateStaticAssets(outDir: string) {
   const loader = createContentLoader("posts/**/*.md", {
     includeSrc: true,
     render: true,
-    transform: entries => preparePosts(entries),
+    transform: (entries) => preparePosts(entries),
   });
   const posts = await loader.load();
   const author = {

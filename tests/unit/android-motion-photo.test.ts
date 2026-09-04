@@ -16,12 +16,7 @@ function join(...parts: Uint8Array[]) {
 }
 
 function jpegWith(metadata: string, media = new Uint8Array()) {
-  return join(
-    new Uint8Array([0xFF, 0xD8]),
-    encoder.encode(metadata),
-    new Uint8Array([0xFF, 0xD9]),
-    media,
-  );
+  return join(new Uint8Array([0xff, 0xd8]), encoder.encode(metadata), new Uint8Array([0xff, 0xd9]), media);
 }
 
 describe("android Motion Photo locator", () => {
@@ -35,34 +30,31 @@ describe("android Motion Photo locator", () => {
     });
   });
 
-  it.each(["MediaDataOffset", "MicroVideoOffset"])(
-    "falls back to the legacy %s metadata",
-    (attribute) => {
-      const media = encoder.encode("legacy-video");
-      const fixture = jpegWith(`<rdf:Description GCamera:${attribute}="${media.length}"/>`, media);
+  it.each(["MediaDataOffset", "MicroVideoOffset"])("falls back to the legacy %s metadata", (attribute) => {
+    const media = encoder.encode("legacy-video");
+    const fixture = jpegWith(`<rdf:Description GCamera:${attribute}="${media.length}"/>`, media);
 
-      expect(locateAndroidMotionPhoto(fixture)).toEqual({
-        offset: fixture.length - media.length,
-        length: media.length,
-        source: "legacy-offset",
-      });
-    },
-  );
+    expect(locateAndroidMotionPhoto(fixture)).toEqual({
+      offset: fixture.length - media.length,
+      length: media.length,
+      source: "legacy-offset",
+    });
+  });
 
   it("rejects an ordinary JPEG", () => {
-    expect(locateAndroidMotionPhoto(new Uint8Array([0xFF, 0xD8, 0xFF, 0xD9]))).toBeNull();
+    expect(locateAndroidMotionPhoto(new Uint8Array([0xff, 0xd8, 0xff, 0xd9]))).toBeNull();
   });
 
   it.each([
     ["too short", new Uint8Array([0, 0, 0, 8])],
-    ["out of bounds", new Uint8Array([0xFF, 0xFF, 0xFF, 0xFF])],
+    ["out of bounds", new Uint8Array([0xff, 0xff, 0xff, 0xff])],
   ])("ignores an ftyp atom with a %s length", (_case, size) => {
     const fixture = jpegWith("", join(size, encoder.encode("ftyp"), encoder.encode("not-video")));
     expect(locateAndroidMotionPhoto(fixture)).toBeNull();
   });
 
   it("rejects an out-of-bounds legacy offset", () => {
-    const fixture = jpegWith("<rdf:Description GCamera:MicroVideoOffset=\"999999\"/>");
+    const fixture = jpegWith('<rdf:Description GCamera:MicroVideoOffset="999999"/>');
     expect(locateAndroidMotionPhoto(fixture)).toBeNull();
   });
 });

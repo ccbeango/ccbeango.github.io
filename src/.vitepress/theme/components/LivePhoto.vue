@@ -10,7 +10,7 @@ const props = defineProps<{
   alt: string;
 }>();
 
-const video = ref<HTMLVideoElement>();
+const videoElement = ref<HTMLVideoElement>();
 const isVideoVisible = ref(false);
 const isLoading = ref(false);
 const resolvedVideoSource = ref(props.video ?? "");
@@ -20,10 +20,10 @@ let isUnmounted = false;
 let playbackAttempt = 0;
 
 function stopVideo() {
-  if (!video.value)
+  if (!videoElement.value)
     return;
-  video.value.pause();
-  video.value.currentTime = 0;
+  videoElement.value.pause();
+  videoElement.value.currentTime = 0;
 }
 
 function releaseAndroidVideo() {
@@ -83,9 +83,9 @@ async function startPlayback() {
 
     isVideoVisible.value = true;
     await nextTick();
-    if (!video.value)
+    if (!videoElement.value)
       throw new Error("Live Photo 视频元素不可用");
-    await video.value.play();
+    await videoElement.value.play();
   }
   catch {
     if (attempt !== playbackAttempt || isUnmounted)
@@ -124,7 +124,7 @@ onBeforeUnmount(() => {
   >
     <template v-if="isVideoVisible">
       <video
-        ref="video"
+        ref="videoElement"
         class="block h-auto w-full object-contain"
         :src="resolvedVideoSource"
         :poster="props.poster"
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
           alt=""
           aria-hidden="true"
           data-live-photo-mark
-        >
+        />
         <span>LIVE</span>
       </button>
     </template>
@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
         decoding="async"
         role="button"
         tabindex="0"
-      >
+      />
       <button
         class="absolute top-2.5 left-2.5 inline-flex h-control w-live-control items-center justify-center gap-1 rounded-sm bg-popover/90 px-1 text-live font-bold tracking-live text-popover-foreground shadow-sm backdrop-blur-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-wait"
         type="button"
@@ -179,7 +179,7 @@ onBeforeUnmount(() => {
           aria-hidden="true"
           data-live-photo-mark
           data-live-photo-loading
-        >
+        />
         <img
           v-else
           class="size-7.5 shrink-0"
@@ -187,7 +187,7 @@ onBeforeUnmount(() => {
           alt=""
           aria-hidden="true"
           data-live-photo-mark
-        >
+        />
         <span>LIVE</span>
       </button>
     </template>

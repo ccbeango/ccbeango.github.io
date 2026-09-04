@@ -18,8 +18,8 @@ const publishedGuides = [
 describe("博客内使用手册", () => {
   it("只保留站点身份、功能图标、通用演示图和 Android 功能样本", async () => {
     const imageFiles = (await readdir(publicDirectory, { recursive: true }))
-      .map(file => file.replaceAll("\\", "/"))
-      .filter(file => /\.(?:ico|jpe?g|png|svg)$/i.test(file))
+      .map((file) => file.replaceAll("\\", "/"))
+      .filter((file) => /\.(?:ico|jpe?g|png|svg)$/i.test(file))
       .sort();
 
     expect(imageFiles).toEqual([
@@ -65,22 +65,33 @@ describe("博客内使用手册", () => {
   });
 
   it("覆盖安装、配置、写作、媒体与发布主题", async () => {
-    const sources = await Promise.all(publishedGuides.map(async ([file]) => (
-      readFile(new URL(file, guideDirectory), "utf8")
-    )));
+    const sources = await Promise.all(
+      publishedGuides.map(async ([file]) => readFile(new URL(file, guideDirectory), "utf8")),
+    );
     const manual = sources.join("\n");
 
     for (const topic of [
       "pnpm dev",
+      "prettier.config.mjs",
+      "htmlWhitespaceSensitivity",
+      "prettier-plugin-tailwindcss",
+      "eslint-plugin-better-tailwindcss",
       "site.config.ts",
       "Frontmatter",
       "Custom Containers",
+      "::: link-card",
       "image-grid",
+      "::: video",
+      "::: music",
+      "open.motues.top",
       "Android Motion Photo",
       "GitHub Pages",
     ]) {
       expect(manual).toContain(topic);
     }
+    expect(manual).toContain("type=details");
+    expect(manual).toContain("自动读取歌曲名、歌手、专辑和封面");
+    expect(manual).toContain("封面接口接收歌曲 ID，而不是 pic_id");
   });
 
   it("使用写作手册展示真实文章封面配置", async () => {

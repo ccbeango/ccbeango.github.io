@@ -32,27 +32,35 @@ pnpm preview
 
 常用命令：
 
-| 命令 | 用途 |
-| --- | --- |
-| `pnpm dev` | 启动 VitePress 开发环境，允许预览草稿 |
-| `pnpm build` | 生成生产静态站点到 `src/.vitepress/dist` |
-| `pnpm build:local` | 使用 `https://username.github.io/` 示例根站点配置执行本地构建 |
-| `pnpm preview` | 预览最近一次生产构建 |
-| `pnpm lint` | 使用 ESLint 检查代码规范与格式 |
-| `pnpm lint:fix` | 自动修复 ESLint 可修复问题 |
-| `pnpm format` | 使用 ESLint 统一格式化项目文件 |
-| `pnpm font:check` | 校验本地字体子包的版本、字重、CSS 与 WOFF2 清单 |
-| `pnpm font:update` | 从官方 latest release 更新并重新生成字体子包 |
-| `pnpm typecheck` | 检查 TypeScript 与 Vue 类型 |
-| `pnpm test` | 执行内容模型单元测试 |
-| `pnpm test:e2e` | 执行桌面与移动 Playwright 测试 |
-| `pnpm audit:styles` | 检查 Tailwind authored styles 边界 |
-| `pnpm verify:build` | 检查路由、元数据、feed 和草稿排除 |
-| `pnpm check` | 执行资产生成与全部自动化检查 |
+| 命令                | 用途                                                          |
+| ------------------- | ------------------------------------------------------------- |
+| `pnpm dev`          | 启动 VitePress 开发环境，允许预览草稿                         |
+| `pnpm build`        | 生成生产静态站点到 `src/.vitepress/dist`                      |
+| `pnpm build:local`  | 使用 `https://username.github.io/` 示例根站点配置执行本地构建 |
+| `pnpm preview`      | 预览最近一次生产构建                                          |
+| `pnpm lint`         | 使用 ESLint 检查代码质量与 Markdown 结构                      |
+| `pnpm lint:fix`     | 自动修复 ESLint 可修复问题                                    |
+| `pnpm format`       | 使用 Prettier 格式化项目文件并排序 Tailwind class             |
+| `pnpm format:check` | 检查项目文件是否符合 Prettier 格式                            |
+| `pnpm font:check`   | 校验本地字体子包的版本、字重、CSS 与 WOFF2 清单               |
+| `pnpm font:update`  | 从官方 latest release 更新并重新生成字体子包                  |
+| `pnpm typecheck`    | 检查 TypeScript 与 Vue 类型                                   |
+| `pnpm test`         | 执行内容模型单元测试                                          |
+| `pnpm test:e2e`     | 执行桌面与移动 Playwright 测试                                |
+| `pnpm audit:styles` | 检查 Tailwind authored styles 边界                            |
+| `pnpm check:staged` | 检查 Git 暂存文件的格式、代码质量和相关样式边界               |
+| `pnpm verify:build` | 检查路由、元数据、feed 和草稿排除                             |
+| `pnpm check:build`  | 执行资产、静态质量、单测、生产构建和产物验证                  |
+| `pnpm check`        | 执行 `check:build` 和完整 Playwright 浏览器回归               |
+
+安装依赖时，`simple-git-hooks` 会注册 `pre-commit` hook。提交前由 `lint-staged` 检查暂存文件的 Prettier 和 ESLint，并在主题样式相关文件变化时执行 `pnpm audit:styles`；检查失败会阻止提交，且不会自动改写文件。
+
+GitHub Pages workflow 在上传静态产物前执行 `pnpm check:build`。格式、字体、样式、lint、类型、单元测试、构建或静态产物验证任一失败时都不会部署。Playwright E2E 不阻塞日常内容发布，需要完整浏览器回归时在本地运行 `pnpm check`。
 
 ## 目录结构
 
 ```text
+AGENTS.md                         # 编码代理共享的项目约束与验证规则
 packages/
   lxgw-wenkai-lite-webfont/ # 可独立更新的本地字体子包
 src/
@@ -76,32 +84,33 @@ tests/              # Vitest 与 Playwright
 
 使用说明位于 `src/posts/guide`，运行开发服务后可从顶部“使用手册”进入。源码入口如下：
 
-| 手册 | 内容 |
-| --- | --- |
-| [开始使用](src/posts/guide/getting-started.md) | 环境、安装、开发服务、目录与命令 |
-| [站点配置](src/posts/guide/site-configuration.md) | 站点身份、导航、社交入口、域名、资源与 Giscus |
-| [文章写作](src/posts/guide/writing-articles.md) | 路由、frontmatter、草稿、精选、系列与资源 |
-| [Markdown 扩展](src/posts/guide/markdown-extensions.md) | GFM、公式、代码、容器、Alerts 与 Code Groups |
-| [图片布局](src/posts/guide/image-layouts.md) | 多图 block、四张宫格、全屏预览、拍摄参数与输入约束 |
-| [Live Photo](src/posts/guide/live-photo.md) | Android Motion Photo、独立 MP4、首帧预览与降级行为 |
-| [部署发布](src/posts/guide/deployment.md) | 环境变量、托管平台与发布检查 |
+| 手册                                                    | 内容                                               |
+| ------------------------------------------------------- | -------------------------------------------------- |
+| [开始使用](src/posts/guide/getting-started.md)          | 环境、安装、开发服务、目录与命令                   |
+| [站点配置](src/posts/guide/site-configuration.md)       | 站点身份、导航、社交入口、域名、资源与 Giscus      |
+| [文章写作](src/posts/guide/writing-articles.md)         | 路由、frontmatter、草稿、精选、系列与资源          |
+| [Markdown 扩展](src/posts/guide/markdown-extensions.md) | GFM、公式、代码、容器、Alerts 与 Code Groups       |
+| [图片布局](src/posts/guide/image-layouts.md)            | 多图 block、四张宫格、全屏预览、拍摄参数与输入约束 |
+| [Live Photo](src/posts/guide/live-photo.md)             | Android Motion Photo、独立 MP4、首帧预览与降级行为 |
+| [部署发布](src/posts/guide/deployment.md)               | 环境变量、托管平台与发布检查                       |
 
 这些文章既是用户文档，也是浏览器集成测试的真实内容。修改语法示例、标题或路径时，需要同步对应测试。
 
 ## 开发约束
 
-- UI 以 Tailwind CSS 4 工具类和主题令牌为主；仅 `ArticlePage.vue` 使用一个 `<style scoped>`，通过标准 CSS Nesting 适配 VitePress 生成的 Markdown DOM
-- scoped Markdown 适配层必须复用设计令牌；其他 Vue `<style>`、额外 CSS、CSS Modules、CSS-in-JS 和内联 `style` 仍被禁止
+- UI 以 Tailwind CSS 4 工具类和主题令牌为主；仅在运行时 DOM、复杂选择器或伪元素无法清晰表达时使用局部 `<style scoped>`
+- 每个 Vue 组件最多包含一个 `<style scoped>` 并复用设计令牌；全局选择器、Tailwind 指令、额外 CSS、CSS Modules、CSS-in-JS 和内联 `style` 均被禁止
 - CSS Nesting 由现有 Tailwind CSS 4 + Vite 构建链处理，不增加 nesting 插件或额外 PostCSS 配置
 - Tailwind 默认色板已关闭；颜色使用 `background` / `foreground`、`card` / `card-foreground` 等语义配对，值统一为 `oklab()`
 - 字体、字号与行高、字距、间距、布局尺寸、控件尺寸、圆角、容器、断点、层级、阴影、模糊、媒体比例和动效均在 `tailwind.css` 中集中管理
 - 暗色值由根节点 `dark:theme-dark` 覆盖同名 token；组件不建立另一套暗色变量，也不重复书写相同语义的 `dark:` class
 - 新 token 必须表达可复用的尺度或稳定语义并有实际消费者；视口计算、动态 grid track 和内容相关边界可以保留 arbitrary value
 - 自定义主题复用 VitePress 的标题锚点、router、代码复制、appearance、目录和 sidebar 基础行为
-- 不使用 Prettier；`pnpm format`、VS Code 保存修复和 `Alt+Shift+F` 统一使用 ESLint Flat Config
+- JavaScript、TypeScript、Vue 和 Markdown 分别使用对应生态的官方 ESLint Flat Config；ESLint 只负责代码质量和 Markdown 结构检查
+- Prettier 是唯一格式化工具；`pnpm format`、VS Code 保存格式化和 `Alt+Shift+F` 读取同一份 `prettier.config.mjs`
 - `.editorconfig`、`.gitattributes` 和 VS Code 统一使用 LF，并保证文件末尾换行
-- JS、TS 与 Vue 代码限制为 120 字符；Vue 多属性标签由 ESLint 自动整理为每行一个属性
-- Vue 模板由 ESLint 自动规范 canonical class，并按照 Tailwind 官方 class order 排序
+- Prettier 使用 120 字符宽度和 2 空格缩进；Vue 多属性标签逐行排列，标签内容与起止标签各占完整行；Markdown 中文段落保持作者原有换行
+- Tailwind 官方 Prettier 插件负责 class order；`eslint-plugin-better-tailwindcss` 只检查 canonical class
 - 本地字体升级方式见 [`packages/lxgw-wenkai-lite-webfont/README.md`](packages/lxgw-wenkai-lite-webfont/README.md)
 
-提交前至少执行 `pnpm lint`、`pnpm typecheck`、`pnpm test` 和 `pnpm audit:styles`。完整发布检查使用 `pnpm check`。
+提交时 hook 会检查暂存文件；较大修改仍应按范围执行类型和相关测试。生产发布检查使用 `pnpm check:build`，完整浏览器验收使用 `pnpm check`。

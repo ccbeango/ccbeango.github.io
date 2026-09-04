@@ -9,28 +9,27 @@ import { generateStaticAssets } from "./build/generate-static.ts";
 import { loadPostSources } from "./data/load-post-sources.ts";
 import { createSeriesSidebar } from "./data/post-utils.ts";
 import { imageGridPlugin } from "./markdown/image-grid.ts";
+import { linkCardPlugin } from "./markdown/link-card.ts";
 import { livePhotoPlugin } from "./markdown/live-photo.ts";
+import { musicPlugin } from "./markdown/music.ts";
 import { photoPreviewPlugin } from "./markdown/photo-preview.ts";
+import { videoPlugin } from "./markdown/video.ts";
 import { requireSiteUrl, siteConfig, withBasePath } from "./site.config.ts";
 
 const srcDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 async function loadSeriesSidebar(includeDrafts: boolean) {
   const files: string[] = [];
-  for await (const file of glob("posts/**/*.md", { cwd: srcDir }))
-    files.push(resolve(srcDir, file));
+  for await (const file of glob("posts/**/*.md", { cwd: srcDir })) files.push(resolve(srcDir, file));
   const posts = await loadPostSources(files.sort(), srcDir, { includeDrafts });
   return createSeriesSidebar(posts);
 }
 
 const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
-  if (command === "build")
-    requireSiteUrl();
+  if (command === "build") requireSiteUrl();
   const sidebar = await loadSeriesSidebar(command !== "build");
   const absolute = (path: string) =>
-    siteConfig.site.url
-      ? new URL(withBasePath(path), `${siteConfig.site.url}/`).toString()
-      : withBasePath(path);
+    siteConfig.site.url ? new URL(withBasePath(path), `${siteConfig.site.url}/`).toString() : withBasePath(path);
 
   return defineConfig({
     lang: siteConfig.site.language,
@@ -65,7 +64,10 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
         detailsLabel: "详细信息",
         customContainers: {
           "image-grid": "图片布局",
+          "link-card": "文章引用",
           "live-photo": "Live Photo",
+          music: "音乐",
+          video: "视频",
         },
       },
       codeCopyButton: {
@@ -79,14 +81,17 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
       config(md) {
         md.use(taskLists, { enabled: true, label: true, labelAfter: true });
         md.use(imageGridPlugin);
+        md.use(linkCardPlugin);
         md.use(livePhotoPlugin);
+        md.use(musicPlugin);
+        md.use(videoPlugin);
         md.use(photoPreviewPlugin);
       },
     },
     sitemap: siteConfig.site.url
       ? {
           hostname: siteConfig.site.url,
-          transformItems: items => items.filter(item => !/(?:^|\/)404\/?$/.test(item.url)),
+          transformItems: (items) => items.filter((item) => !/(?:^|\/)404\/?$/.test(item.url)),
         }
       : undefined,
     head: [
@@ -94,26 +99,41 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
       ["link", { rel: "icon", href: withBasePath(siteConfig.site.favicon.svg), type: "image/svg+xml" }],
       ["link", { rel: "icon", href: withBasePath(siteConfig.site.favicon.png), type: "image/png" }],
       ["link", { rel: "manifest", href: withBasePath(siteConfig.site.manifest) }],
-      ["link", { rel: "alternate", type: "application/rss+xml", title: "RSS", href: withBasePath(siteConfig.site.feeds.rss) }],
-      ["link", { rel: "alternate", type: "application/atom+xml", title: "Atom", href: withBasePath(siteConfig.site.feeds.atom) }],
-      ["link", { rel: "alternate", type: "application/feed+json", title: "JSON Feed", href: withBasePath(siteConfig.site.feeds.json) }],
+      [
+        "link",
+        { rel: "alternate", type: "application/rss+xml", title: "RSS", href: withBasePath(siteConfig.site.feeds.rss) },
+      ],
+      [
+        "link",
+        {
+          rel: "alternate",
+          type: "application/atom+xml",
+          title: "Atom",
+          href: withBasePath(siteConfig.site.feeds.atom),
+        },
+      ],
+      [
+        "link",
+        {
+          rel: "alternate",
+          type: "application/feed+json",
+          title: "JSON Feed",
+          href: withBasePath(siteConfig.site.feeds.json),
+        },
+      ],
     ],
     transformHead({ page, pageData }) {
       const params = pageData.params as Record<string, unknown> | undefined;
       const title = typeof params?.title === "string" ? params.title : pageData.title;
-      const description = typeof params?.description === "string"
-        ? params.description
-        : siteConfig.site.description;
-      const keywords = typeof params?.keywords === "string" && params.keywords
-        ? params.keywords
-        : siteConfig.site.keywords.join(",");
-      const routePath = typeof params?.url === "string"
-        ? params.url
-        : `/${page}`
-            .replace(/(?:index)?\.(?:md|html)$/, "");
-      const canonical = typeof params?.canonical === "string" && params.canonical
-        ? params.canonical
-        : absolute(routePath.startsWith("/") ? routePath : `/${routePath}`);
+      const description = typeof params?.description === "string" ? params.description : siteConfig.site.description;
+      const keywords =
+        typeof params?.keywords === "string" && params.keywords ? params.keywords : siteConfig.site.keywords.join(",");
+      const routePath =
+        typeof params?.url === "string" ? params.url : `/${page}`.replace(/(?:index)?\.(?:md|html)$/, "");
+      const canonical =
+        typeof params?.canonical === "string" && params.canonical
+          ? params.canonical
+          : absolute(routePath.startsWith("/") ? routePath : `/${routePath}`);
       return [
         ["meta", { name: "description", content: description }],
         ["meta", { name: "keywords", content: keywords }],

@@ -22,13 +22,13 @@ draft: false
 
 ## 通用构建设置
 
-| 设置 | 值 |
-| --- | --- |
-| Install command | `pnpm install --frozen-lockfile` |
-| Build command | `pnpm build` |
-| Output directory | `src/.vitepress/dist` |
-| Node.js | 22.12 或更高 |
-| 必需环境变量 | `SITE_URL=https://你的域名` |
+| 设置             | 值                               |
+| ---------------- | -------------------------------- |
+| Install command  | `pnpm install --frozen-lockfile` |
+| Build command    | `pnpm build`                     |
+| Output directory | `src/.vitepress/dist`            |
+| Node.js          | 22.12 或更高                     |
+| 必需环境变量     | `SITE_URL=https://你的域名`      |
 
 生产构建缺少 `SITE_URL` 会失败，避免发布错误的 canonical、robots、sitemap 和 feed URL。
 
@@ -43,7 +43,7 @@ pnpm preview
 
 ## GitHub Pages
 
-当前 workflow 位于 `.github/workflows/deploy.yml`，在 `master` 分支 push 或手动触发时构建并发布 `src/.vitepress/dist`。它直接声明当前根站点配置：
+当前 workflow 位于 `.github/workflows/deploy.yml`，在 `master` 分支 push 或手动触发时检查、构建并发布 `src/.vitepress/dist`。它直接声明当前根站点配置：
 
 ```text
 SITE_URL=https://username.github.io
@@ -59,7 +59,9 @@ SITE_URL=https://username.github.io
 SITE_BASE=/bean-blog/
 ```
 
-workflow 使用 GitHub Pages 官方 artifact 和 OIDC 部署，不需要个人 Access Token 或手工维护 `gh-pages` 分支。切换自定义域名后，把 `SITE_URL` 改为最终 HTTPS 域名；根路径部署时保持 `SITE_BASE=/`。
+workflow 使用 GitHub Pages 官方 artifact 和 OIDC 部署，不需要个人 Access Token 或手工维护 `gh-pages` 分支。构建任务执行 `pnpm check:build`；只有格式、字体、样式、lint、类型、单元测试、生产构建和静态产物检查全部通过，才会上传 Pages artifact 并进入部署任务。切换自定义域名后，把 `SITE_URL` 改为最终 HTTPS 域名；根路径部署时保持 `SITE_BASE=/`。
+
+Playwright 不参与线上部署，因此 GitHub Pages 构建无需下载 Chromium。需要完整浏览器回归时，在本地安装 Playwright Chromium 并执行 `pnpm check`；也可以通过 `pnpm test:e2e` 只运行已有桌面与移动端测试。
 
 ## Cloudflare Pages
 
@@ -98,6 +100,14 @@ pnpm check
 ```
 
 `pnpm check` 会生成资源，校验字体和样式边界，执行 lint、类型检查、单元测试、生产构建、静态产物检查和浏览器回归。
+
+只验证生产构建且不需要浏览器回归时执行：
+
+```powershell
+$env:SITE_URL='https://username.github.io'
+$env:SITE_BASE='/'
+pnpm check:build
+```
 
 完成后运行 `pnpm preview`，并确认以下地址可访问：
 

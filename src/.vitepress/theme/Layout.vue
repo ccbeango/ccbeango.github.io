@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Content, useData } from "vitepress";
 import { computed } from "vue";
+import GlobalMusicPlayer from "./components/GlobalMusicPlayer.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import SiteHeader from "./components/SiteHeader.vue";
 import ArchivesPage from "./views/ArchivesPage.vue";
@@ -43,5 +44,6 @@ registerWatchers({ closeSidebar });
       </main>
     </div>
     <SiteFooter />
+    <GlobalMusicPlayer />
   </div>
 </template>

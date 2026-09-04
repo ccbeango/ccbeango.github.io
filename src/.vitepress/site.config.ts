@@ -22,20 +22,19 @@ export interface GiscusConfig {
 
 export function isGiscusConfigured(value: Partial<GiscusConfig> | null | undefined): value is GiscusConfig {
   return Boolean(
-    value?.repo
-    && value.repoId
-    && value.category
-    && value.categoryId
-    && value.mapping
-    && value.reactionsEnabled
-    && value.inputPosition
-    && value.lang,
+    value?.repo &&
+    value.repoId &&
+    value.category &&
+    value.categoryId &&
+    value.mapping &&
+    value.reactionsEnabled &&
+    value.inputPosition &&
+    value.lang,
   );
 }
 
 function normalizeBase(value: string | undefined) {
-  if (!value || value === "/")
-    return "/";
+  if (!value || value === "/") return "/";
   return `/${value.replace(/^\/+|\/+$/g, "")}/`;
 }
 
@@ -92,16 +91,13 @@ export const siteConfig = {
 
 export function requireSiteUrl() {
   if (!siteConfig.site.url) {
-    throw new Error(
-      "生产构建需要 SITE_URL，例如：$env:SITE_URL='https://blog.example.com'; pnpm build",
-    );
+    throw new Error("生产构建需要 SITE_URL，例如：$env:SITE_URL='https://blog.example.com'; pnpm build");
   }
   return siteConfig.site.url;
 }
 
 export function withBasePath(path: string) {
-  if (/^(?:[a-z]+:)?\/\//i.test(path))
-    return path;
+  if (/^(?:[a-z]+:)?\/\//i.test(path)) return path;
   const normalized = path.startsWith("/") ? path.slice(1) : path;
   return `${siteConfig.site.base}${normalized}`.replace(/\/+/g, "/");
 }

@@ -89,6 +89,7 @@
 
   --z-index-content: 10;
   --z-index-control: 20;
+  --z-index-player: 25;
   --z-index-navigation: 30;
 
   --shadow-*: initial;
@@ -119,6 +120,7 @@
   --default-transition-timing-function: var(--ease-standard);
   --animate-spinner: spin 1s linear infinite;
   --animate-live-photo: spin 5s linear infinite;
+  --animate-music-record: spin 18s linear infinite;
 
   --color-*: initial;
   --color-transparent: oklab(0% 0 0 / 0);
@@ -207,4 +209,12 @@
 
 @utility duration-slow {
   transition-duration: var(--duration-slow);
+}
+
+@utility music-record-paused {
+  animation-play-state: paused;
+}
+
+@utility music-record-running {
+  animation-play-state: running;
 }

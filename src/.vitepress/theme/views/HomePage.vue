@@ -36,7 +36,9 @@ const href = (value: string) => /^(?:[a-z]+:)?\/\//i.test(value) ? value : withB
           :href="href(social.href)"
           :target="social.href.startsWith('http') ? '_blank' : undefined"
           :rel="social.href.startsWith('http') ? 'noreferrer' : undefined"
-        >{{ social.label }}</a>
+        >
+          {{ social.label }}
+        </a>
       </div>
     </section>
 
@@ -46,9 +48,7 @@ const href = (value: string) => /^(?:[a-z]+:)?\/\//i.test(value) ? value : withB
     >
       <div class="mb-7 flex items-end justify-between gap-4">
         <div>
-          <p class="text-xs font-semibold text-muted-foreground uppercase">
-            Featured
-          </p>
+          <p class="text-xs font-semibold text-muted-foreground uppercase">Featured</p>
           <h2
             id="featured-title"
             class="mt-1 text-2xl font-bold"
@@ -60,7 +60,8 @@ const href = (value: string) => /^(?:[a-z]+:)?\/\//i.test(value) ? value : withB
           class="inline-flex h-control shrink-0 items-center gap-2 rounded-md px-2 text-sm font-medium text-primary focus-visible:outline-2 focus-visible:outline-ring"
           :href="withBase('/blog')"
         >
-          全部文章 <ArrowRight
+          全部文章
+          <ArrowRight
             :size="17"
             aria-hidden="true"
           />

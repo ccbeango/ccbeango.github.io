@@ -1,7 +1,7 @@
 import type { MarkdownRenderer } from "vitepress";
 
 const MODES = ["landscape", "portrait", "r73", "r37", "r64", "r46"] as const;
-type ImageGridMode = typeof MODES[number];
+type ImageGridMode = (typeof MODES)[number];
 
 const OPEN_TOKEN = "container_image-grid_open";
 const CLOSE_TOKEN = "container_image-grid_close";
@@ -33,8 +33,7 @@ const GRID_ITEM_MODE_CLASSES: Record<ImageGridMode, readonly string[]> = {
 const GRID_IMAGE_CLASSES = "m-0 block h-full w-full object-cover";
 
 function hasExplicitClose(source: string, endLine: number | undefined, openingMarkup: string) {
-  if (endLine === undefined)
-    return false;
+  if (endLine === undefined) return false;
   const closingMarkup = source.split(/\r?\n/)[endLine]?.trim() ?? "";
   return /^:+$/.test(closingMarkup) && closingMarkup.length >= openingMarkup.length;
 }
@@ -43,23 +42,22 @@ export function imageGridPlugin(md: MarkdownRenderer) {
   md.core.ruler.push("image-grid", (state) => {
     const fail = (message: string, tokenIndex: number): never => {
       const token = state.tokens[tokenIndex];
-      const path = typeof state.env?.path === "string"
-        ? state.env.path
-        : typeof state.env?.relativePath === "string"
-          ? state.env.relativePath
-          : "Markdown";
+      const path =
+        typeof state.env?.path === "string"
+          ? state.env.path
+          : typeof state.env?.relativePath === "string"
+            ? state.env.relativePath
+            : "Markdown";
       const line = token?.map ? `:${token.map[0] + 1}` : "";
       throw new Error(`[image-grid] ${path}${line} ${message}`);
     };
 
     for (let index = 0; index < state.tokens.length; index += 1) {
       const opening = state.tokens[index];
-      if (opening.type !== OPEN_TOKEN)
-        continue;
+      if (opening.type !== OPEN_TOKEN) continue;
 
       const [name, rawMode, ...extra] = opening.info.trim().split(/\s+/);
-      if (name !== "image-grid" || !rawMode || extra.length > 0)
-        fail(`布局必须是 ${MODES.join(", ")} 之一`, index);
+      if (name !== "image-grid" || !rawMode || extra.length > 0) fail(`布局必须是 ${MODES.join(", ")} 之一`, index);
       const mode = rawMode.toLowerCase();
       if (!modeSet.has(mode)) {
         fail(`不支持布局 ${mode}，可用布局为 ${MODES.join(", ")}`, index);
@@ -76,10 +74,7 @@ export function imageGridPlugin(md: MarkdownRenderer) {
           break;
         }
       }
-      if (
-        closingIndex < 0
-        || !hasExplicitClose(state.src, opening.map?.[1], opening.markup)
-      ) {
+      if (closingIndex < 0 || !hasExplicitClose(state.src, opening.map?.[1], opening.markup)) {
         fail("缺少 ::: 结束标记", index);
       }
 
@@ -90,9 +85,9 @@ export function imageGridPlugin(md: MarkdownRenderer) {
         const inline = state.tokens[cursor + 1];
         const paragraphClose = state.tokens[cursor + 2];
         if (
-          paragraphOpen?.type !== "paragraph_open"
-          || inline?.type !== "inline"
-          || paragraphClose?.type !== "paragraph_close"
+          paragraphOpen?.type !== "paragraph_open" ||
+          inline?.type !== "inline" ||
+          paragraphClose?.type !== "paragraph_close"
         ) {
           fail("区块内只允许普通 Markdown 图片", cursor);
         }
@@ -102,10 +97,8 @@ export function imageGridPlugin(md: MarkdownRenderer) {
             images.push({ token: child, map: inline.map });
             continue;
           }
-          if (child.type === "softbreak" || child.type === "hardbreak")
-            continue;
-          if (child.type === "text" && child.content.trim() === "")
-            continue;
+          if (child.type === "softbreak" || child.type === "hardbreak") continue;
+          if (child.type === "text" && child.content.trim() === "") continue;
           fail("区块内只允许普通 Markdown 图片和换行", cursor + 1);
         }
         cursor += 3;
@@ -123,9 +116,7 @@ export function imageGridPlugin(md: MarkdownRenderer) {
       const gridOpen = new state.Token("image_grid_open", "figure", 1);
       gridOpen.block = true;
       gridOpen.map = opening.map;
-      const equalGridClass = isRatioLayout
-        ? ""
-        : EQUAL_GRID_CLASSES[images.length as 2 | 3 | 4];
+      const equalGridClass = isRatioLayout ? "" : EQUAL_GRID_CLASSES[images.length as 2 | 3 | 4];
       gridOpen.attrSet(
         "class",
         [GRID_BASE_CLASSES, GRID_MODE_CLASSES[typedMode], equalGridClass].filter(Boolean).join(" "),
@@ -142,10 +133,8 @@ export function imageGridPlugin(md: MarkdownRenderer) {
         itemOpen.attrSet("class", `${GRID_ITEM_BASE_CLASSES} ${itemModeClass}`);
 
         image.attrJoin("class", GRID_IMAGE_CLASSES);
-        if (!image.attrGet("loading"))
-          image.attrSet("loading", "lazy");
-        if (!image.attrGet("decoding"))
-          image.attrSet("decoding", "async");
+        if (!image.attrGet("loading")) image.attrSet("loading", "lazy");
+        if (!image.attrGet("decoding")) image.attrSet("decoding", "async");
 
         const inline = new state.Token("inline", "", 0);
         inline.content = image.content;

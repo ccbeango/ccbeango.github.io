@@ -10,7 +10,7 @@ export default defineRoutes({
   watch: "../posts/**/*.md",
   async paths(files) {
     const posts = await loadPostSources(files, srcDir);
-    return collectTags(posts).map(tag => ({
+    return collectTags(posts).map((tag) => ({
       params: { tag: tag.slug, tagName: tag.name },
     }));
   },

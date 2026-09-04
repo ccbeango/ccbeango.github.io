@@ -52,7 +52,9 @@ const {
         <span
           data-series-name
           class="min-w-0 text-label font-semibold"
-        >{{ item.text }}</span>
+        >
+          {{ item.text }}
+        </span>
         <ChevronRight
           :size="16"
           class="mt-1 shrink-0 transition-transform"

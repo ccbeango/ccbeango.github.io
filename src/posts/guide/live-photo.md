@@ -65,4 +65,4 @@ CDN、图片压缩服务和对象存储处理链必须保留 Android 原文件�
 
 `live-photo` 是本博客注册的 VitePress Custom Container。区块内必须且只能包含一张普通 Markdown 图片，图片继续提供静态首帧、alt 和资源地址。
 
-开始行只能使用 `::: live-photo android` 或在 `live-photo` 后提供一个非空 MP4 地址。缺少图片、包含正文、嵌套 block 或遗漏结束 `:::` 都会在开发时报告文件与行号。旧的 HTML comment 写法不再解析。
+开始行只能使用 `::: live-photo android` 或在 `live-photo` 后提供一个非空 MP4 地址。缺少图片、包含正文、嵌套 block、使用其它 block 形式或遗漏结束 `:::`，都会在开发时报告文件与行号。

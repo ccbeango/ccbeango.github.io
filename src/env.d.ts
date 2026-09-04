@@ -19,9 +19,7 @@ declare module "vitepress/dist/client/theme-default/composables/layout.js" {
     hasLocalNav: ComputedRef<boolean>;
   };
 
-  export function registerWatchers(options: {
-    closeSidebar: () => void;
-  }): void;
+  export function registerWatchers(options: { closeSidebar: () => void }): void;
 }
 
 declare module "vitepress/dist/client/theme-default/composables/outline.js" {
@@ -31,10 +29,7 @@ declare module "vitepress/dist/client/theme-default/composables/outline.js" {
   export function getHeaders(
     range?: DefaultTheme.Outline | DefaultTheme.Outline["level"] | false,
   ): DefaultTheme.OutlineItem[];
-  export function useActiveAnchor(
-    container: Ref<HTMLElement | undefined>,
-    marker: Ref<HTMLElement | undefined>,
-  ): void;
+  export function useActiveAnchor(container: Ref<HTMLElement | undefined>, marker: Ref<HTMLElement | undefined>): void;
 }
 
 declare module "vitepress/dist/client/theme-default/composables/sidebar.js" {
@@ -48,9 +43,7 @@ declare module "vitepress/dist/client/theme-default/composables/sidebar.js" {
     toggle: () => void;
   };
 
-  export function useSidebarItemControl(
-    item: Readonly<Ref<DefaultTheme.SidebarItem>>,
-  ): {
+  export function useSidebarItemControl(item: Readonly<Ref<DefaultTheme.SidebarItem>>): {
     collapsed: Ref<boolean>;
     collapsible: ComputedRef<boolean>;
     isLink: ComputedRef<boolean>;

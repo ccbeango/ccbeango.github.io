@@ -49,7 +49,9 @@ onUnmounted(() => {
         v-if="item.href"
         :class="level === 0 ? 'block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-ring' : 'block rounded-sm px-3 py-2 text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring'"
         :href="href(item.href)"
-      >{{ item.title }}</a>
+      >
+        {{ item.title }}
+      </a>
       <details
         v-else
         class="group relative"

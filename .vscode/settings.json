@@ -1,23 +1,14 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "never"
+    "source.fixAll.eslint": "explicit"
   },
-  "editor.formatOnSave": false,
-  "eslint.format.enable": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "eslint.format.enable": false,
   "eslint.useFlatConfig": true,
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "vue",
-    "json",
-    "jsonc",
-    "yaml",
-    "markdown"
-  ],
-  "[javascript][javascriptreact][typescript][typescriptreact][vue][json][jsonc][yaml][markdown]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+  "eslint.validate": ["javascript", "typescript", "vue", "json", "jsonc", "yaml", "markdown"],
+  "prettier.requireConfig": true
 }

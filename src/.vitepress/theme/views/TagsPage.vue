@@ -9,12 +9,8 @@ const tags = collectTags(posts);
 <template>
   <main class="mx-auto w-full max-w-content px-page-gutter pt-12 pb-8 sm:px-page-gutter-wide sm:pt-16">
     <header class="mb-10">
-      <p class="text-xs font-semibold text-muted-foreground uppercase">
-        Topics
-      </p>
-      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">
-        标签
-      </h1>
+      <p class="text-xs font-semibold text-muted-foreground uppercase">Topics</p>
+      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">标签</h1>
     </header>
     <ul
       v-if="tags.length"

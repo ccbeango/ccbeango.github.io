@@ -53,7 +53,9 @@ defineExpose({ open });
           id="search-title"
           for="site-search"
           class="sr-only"
-        >搜索文章</label>
+        >
+          搜索文章
+        </label>
         <input
           id="site-search"
           ref="input"
@@ -62,7 +64,7 @@ defineExpose({ open });
           type="search"
           placeholder="搜索标题、摘要或标签"
           autocomplete="off"
-        >
+        />
         <button
           type="button"
           class="flex size-control-sm shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"

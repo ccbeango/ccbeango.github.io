@@ -1,0 +1,11 @@
+.codex/
+coverage/
+node_modules/
+packages/lxgw-wenkai-lite-webfont/index.css
+packages/lxgw-wenkai-lite-webfont/dist/
+playwright-report/
+pnpm-lock.yaml
+src/.vitepress/.temp/
+src/.vitepress/cache/
+src/.vitepress/dist/
+test-results/

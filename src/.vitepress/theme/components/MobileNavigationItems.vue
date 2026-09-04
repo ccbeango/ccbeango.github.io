@@ -17,7 +17,9 @@ const href = (value: string) => /^(?:[a-z]+:)?\/\//i.test(value) ? value : withB
         v-if="item.href"
         :class="nested ? 'block rounded-md px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring' : 'block rounded-md px-3 py-3 text-lg font-semibold hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring'"
         :href="href(item.href)"
-      >{{ item.title }}</a>
+      >
+        {{ item.title }}
+      </a>
       <details
         v-else
         class="group"

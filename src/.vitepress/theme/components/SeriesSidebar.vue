@@ -24,7 +24,7 @@ onUnmounted(() => document.removeEventListener("pointerdown", handleDocumentPoin
   <aside
     v-if="hasSidebar"
     ref="container"
-    class="sticky top-0 z-navigation col-start-1 row-start-1 h-0 xl:top-side-rail-top xl:mt-12 xl:h-auto xl:w-56 xl:self-start xl:justify-self-end"
+    class="sticky top-0 z-control col-start-1 row-start-1 h-0 xl:top-side-rail-top xl:mt-12 xl:h-auto xl:w-56 xl:self-start xl:justify-self-end"
     aria-label="系列文章"
   >
     <button
