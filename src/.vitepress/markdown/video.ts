@@ -1,4 +1,5 @@
 import type { MarkdownRenderer } from "vitepress";
+import { addMomentRichMedia } from "./moment-content.ts";
 
 const OPEN_TOKEN = "container_video_open";
 const CLOSE_TOKEN = "container_video_close";
@@ -85,7 +86,15 @@ export function videoPlugin(md: MarkdownRenderer) {
       const replacement = new state.Token("html_block", "", 0);
       replacement.block = true;
       replacement.map = opening.map;
-      replacement.content = `<VideoPlayer source="${escapeAttribute(source)}"${poster ? ` poster="${escapeAttribute(poster)}"` : ""} title="${escapeAttribute(title)}" />\n`;
+      const marker = addMomentRichMedia(state.env, {
+        type: "video",
+        source,
+        ...(poster ? { poster } : {}),
+        title,
+      });
+      replacement.content = marker
+        ? `<!--${marker}-->\n`
+        : `<VideoPlayer source="${escapeAttribute(source)}"${poster ? ` poster="${escapeAttribute(poster)}"` : ""} title="${escapeAttribute(title)}" />\n`;
 
       state.tokens.splice(index, closingIndex - index + 1, replacement);
     }

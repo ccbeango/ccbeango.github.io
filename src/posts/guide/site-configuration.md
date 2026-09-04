@@ -21,10 +21,10 @@ draft: false
 
 项目有两个配置入口，它们服务于不同层级：
 
-| 文件                            | 职责                                                    | 什么时候修改             |
-| ------------------------------- | ------------------------------------------------------- | ------------------------ |
-| `src/.vitepress/site.config.ts` | 站点名称、作者、导航、社交入口、分页、图标、Feed 和评论 | 搭建自己的博客时需要修改 |
-| `src/.vitepress/config.ts`      | VitePress 路由、Markdown、侧栏、SEO、资源注入和构建钩子 | 调整工程能力时才修改     |
+| 文件                            | 职责                                                              | 什么时候修改             |
+| ------------------------------- | ----------------------------------------------------------------- | ------------------------ |
+| `src/.vitepress/site.config.ts` | 站点名称、作者、动态身份、导航、社交入口、分页、图标、Feed 和评论 | 搭建自己的博客时需要修改 |
+| `src/.vitepress/config.ts`      | VitePress 路由、Markdown、侧栏、SEO、资源注入和构建钩子           | 调整工程能力时才修改     |
 
 日常配置优先集中在 `site.config.ts`。页面组件和构建逻辑会读取这里的数据，不应在组件中重复写作者名称、域名或社交账号。
 
@@ -107,6 +107,26 @@ env:
 | `email` | `string` | 是       | Feed 等输出中的作者邮箱 | `hello@example.com`          |
 | `bio`   | `string` | 是       | 首页作者简介            | `一名持续学习的软件工程师。` |
 
+## 动态页配置
+
+`siteConfig.moment` 集中控制 `/moment` 的个人区和滚动批次，不需要在每条动态中重复声明作者身份。
+
+| 配置              | 类型       | 建议修改 | 用途                                            | 当前值示例                   |
+| ----------------- | ---------- | -------- | ----------------------------------------------- | ---------------------------- |
+| `covers`          | `string[]` | 是       | 个人区封面列表，进入页面时随机选择一张          | `[/moments/cover.webp, ...]` |
+| `displayName`     | `string`   | 按需     | 动态作者名；省略或留空时回退到 `author.name`    | `Bean`                       |
+| `avatar`          | `string`   | 按需     | 动态头像；省略或留空时回退到 `site.favicon.svg` | `/favicon.svg`               |
+| `signature`       | `string`   | 按需     | 个人签名；省略或留空时回退到 `author.bio`       | `一名持续学习的软件工程师。` |
+| `momentBatchSize` | `number`   | 按需     | 首批和后续每批动态数量，必须是正整数            | `4`                          |
+
+`covers` 至少提供一项，空路径会导致配置加载失败，重复路径会自动去重。每次进入 `/moment` 时页面随机选择一张，停留期间不会自行切换：
+
+```ts
+covers: ["/moments/cover.webp", "/moments/cover-spring.webp", "/moments/cover-night.webp"],
+```
+
+封面和头像应存放在 `src/public`，配置值使用以 `/` 开头的公开路径。页面会为这些路径和动态图片统一拼接 `SITE_BASE`。完整写作格式见[发布短动态](/blog/guide/posting-moments)。
+
 ## 导航配置
 
 `siteConfig.navigation` 是 `NavItem[]`。有 `href` 的项目是直接链接，有 `children` 的项目显示为下拉菜单；`children` 仍是 `NavItem[]`，因此支持继续嵌套。
@@ -120,6 +140,7 @@ env:
 ```ts
 const navigation = [
   { title: "文章", href: "/blog" },
+  { title: "动态", href: "/moment" },
   { title: "使用手册", href: "/blog/guide/getting-started" },
   {
     title: "浏览",
@@ -185,19 +206,19 @@ const giscus = {
 
 ### 顶层选项
 
-| 配置                  | 当前值或来源                               | 建议修改 | 作用                                                                  |
-| --------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------- |
-| `lang`                | `siteConfig.site.language`                 | 否       | 设置文档和 HTML 语言                                                  |
-| `title`               | `siteConfig.site.title`                    | 否       | 设置全站标题                                                          |
-| `titleTemplate`       | `` `:title \| ${siteConfig.site.title}` `` | 按需     | 组合页面标题与站点标题                                                |
-| `description`         | `siteConfig.site.description`              | 否       | 设置默认页面描述                                                      |
-| `base`                | `siteConfig.site.base`                     | 否       | 设置 VitePress 部署基础路径                                           |
-| `srcExclude`          | `["posts/**/*.md"]`                        | 否       | 不让源文章直接生成 `/posts/...` 页面；文章由 `/blog` 动态路由统一发布 |
-| `cleanUrls`           | `true`                                     | 按需     | 生成不带 `.html` 的公开 URL                                           |
-| `lastUpdated`         | `true`                                     | 按需     | 让 VitePress 收集 Git 最后更新时间                                    |
-| `appearance`          | `true`                                     | 按需     | 启用 VitePress 明暗模式状态和切换能力                                 |
-| `themeConfig.sidebar` | 自动生成                                   | 否       | 根据文章 frontmatter 的 `series` 生成官方格式 sidebar                 |
-| `vite.plugins`        | `[tailwindcss()]`                          | 否       | 使用 Tailwind CSS 4 的 Vite plugin 处理主题样式                       |
+| 配置                  | 当前值或来源                               | 建议修改 | 作用                                                   |
+| --------------------- | ------------------------------------------ | -------- | ------------------------------------------------------ |
+| `lang`                | `siteConfig.site.language`                 | 否       | 设置文档和 HTML 语言                                   |
+| `title`               | `siteConfig.site.title`                    | 否       | 设置全站标题                                           |
+| `titleTemplate`       | `` `:title \| ${siteConfig.site.title}` `` | 按需     | 组合页面标题与站点标题                                 |
+| `description`         | `siteConfig.site.description`              | 否       | 设置默认页面描述                                       |
+| `base`                | `siteConfig.site.base`                     | 否       | 设置 VitePress 部署基础路径                            |
+| `srcExclude`          | `["posts/**/*.md", "moments/**/*.md"]`     | 否       | 不让文章和动态原稿直接生成 `/posts` 或 `/moments` 页面 |
+| `cleanUrls`           | `true`                                     | 按需     | 生成不带 `.html` 的公开 URL                            |
+| `lastUpdated`         | `true`                                     | 按需     | 让 VitePress 收集 Git 最后更新时间                     |
+| `appearance`          | `true`                                     | 按需     | 启用 VitePress 明暗模式状态和切换能力                  |
+| `themeConfig.sidebar` | 自动生成                                   | 否       | 根据文章 frontmatter 的 `series` 生成官方格式 sidebar  |
+| `vite.plugins`        | `[tailwindcss()]`                          | 否       | 使用 Tailwind CSS 4 的 Vite plugin 处理主题样式        |
 
 配置函数还会根据 `command` 区分环境：开发服务的系列侧栏包含草稿，生产构建会排除草稿；执行生产构建前调用 `requireSiteUrl()`，缺少 `SITE_URL` 时主动失败，避免发布带错误绝对地址的页面。
 

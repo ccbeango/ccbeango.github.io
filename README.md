@@ -66,14 +66,16 @@ packages/
 src/
   .vitepress/
     build/          # robots、manifest 与 feed 生成
-    data/           # frontmatter 契约和文章转换
+    data/           # frontmatter 契约、文章与动态转换
     theme/          # 自定义 Layout、views、components 与 Tailwind 入口
     config.ts       # VitePress 配置与 head hooks
     site.config.ts  # 站点身份和第三方集成
   posts/            # Markdown 文章来源，不直接生成 /posts 路由
     guide/           # 博客内使用手册，同时作为功能测试内容
-  public/           # favicon、OG 图和文章静态资源
+  moments/          # Markdown 短动态来源，不直接生成 /moments 路由
+  public/           # favicon、封面和内容静态资源
   blog/             # /blog 与 dynamic routes
+  moment/           # /moment 动态聚合 route
   tags/             # 标签 routes
   archives/         # 归档 route
 scripts/            # 资产、样式和静态产物检查
@@ -89,6 +91,7 @@ tests/              # Vitest 与 Playwright
 | [开始使用](src/posts/guide/getting-started.md)          | 环境、安装、开发服务、目录与命令                   |
 | [站点配置](src/posts/guide/site-configuration.md)       | 站点身份、导航、社交入口、域名、资源与 Giscus      |
 | [文章写作](src/posts/guide/writing-articles.md)         | 路由、frontmatter、草稿、精选、系列与资源          |
+| [短动态](src/posts/guide/posting-moments.md)            | 短 Markdown、图片宫格、滚动加载与稳定链接          |
 | [Markdown 扩展](src/posts/guide/markdown-extensions.md) | GFM、公式、代码、容器、Alerts 与 Code Groups       |
 | [图片布局](src/posts/guide/image-layouts.md)            | 多图 block、四张宫格、全屏预览、拍摄参数与输入约束 |
 | [Live Photo](src/posts/guide/live-photo.md)             | Android Motion Photo、独立 MP4、首帧预览与降级行为 |

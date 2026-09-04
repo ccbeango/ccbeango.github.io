@@ -16,7 +16,12 @@ const requiredFiles = [
   "blog/guide/markdown-extensions.html",
   "blog/guide/image-layouts.html",
   "blog/guide/live-photo.html",
+  "blog/guide/posting-moments.html",
   "blog/guide/deployment.html",
+  "moment/index.html",
+  "media/live-photo-sample-poster.png",
+  "moments/cover.webp",
+  "moments/LICENSE-Hugo-Theme-Amigo.txt",
   "tags/index.html",
   "archives/index.html",
   "robots.txt",
@@ -53,7 +58,20 @@ assert(
   !files.some((file) => relative(dist, file).replace(/\\/g, "/").startsWith("posts/")),
   "构建产物不得暴露 /posts 原稿路由",
 );
-assert(!publicText.includes("draft-preview") && !publicText.includes("草稿预览示例"), "公开产物不得包含草稿");
+assert(
+  !files.some((file) => relative(dist, file).replace(/\\/g, "/").startsWith("moments/") && /\.html$/.test(file)),
+  "构建产物不得暴露 /moments 原稿路由",
+);
+assert(
+  !files.some((file) => relative(dist, file).replace(/\\/g, "/").startsWith("moment/page/")),
+  "动态页面不得生成分页路由",
+);
+assert(
+  !files.some((file) => relative(dist, file).replace(/\\/g, "/") === "blog/guide/draft-preview.html") &&
+    !publicText.includes("草稿预览示例") &&
+    !publicText.includes("这条动态只在开发环境中用于检查草稿样式"),
+  "公开产物不得包含草稿",
+);
 
 const article = await readFile(join(dist, "blog", "guide", "markdown-extensions.html"), "utf8");
 assert(article.includes("<mjx-container"), "文章必须渲染数学公式");
@@ -69,6 +87,20 @@ assert(
   "sitemap 必须包含绝对多段文章地址",
 );
 assert(!sitemap.includes("/posts/") && !sitemap.includes("/404"), "sitemap 不得包含原稿或 404");
+assert(sitemap.includes("/moment/") && !sitemap.includes("/moment/page/"), "sitemap 必须只包含动态聚合页");
+assert(!sitemap.includes("#moment-"), "sitemap 不得把动态 fragment 作为独立条目");
+
+const moment = await readFile(join(dist, "moment", "index.html"), "utf8");
+const blogIndex = await readFile(join(dist, "blog", "index.html"), "utf8");
+assert(
+  moment.includes("data-moment-profile") &&
+    moment.includes("data-moment-header") &&
+    moment.includes("data-moment-load-state") &&
+    moment.includes("moment-2026-early-autumn"),
+  "动态首页结构无效",
+);
+assert(!blogIndex.includes("moment-2026-early-autumn"), "文章列表不得混入短动态");
+assert(!moment.includes("点赞") && !moment.includes("评论"), "动态页面不得包含虚假互动控件");
 
 const robots = await readFile(join(dist, "robots.txt"), "utf8");
 assert(robots.includes("User-agent: *") && robots.includes("Sitemap: https://"), "robots 规则或 sitemap 地址无效");
@@ -79,6 +111,7 @@ assert(manifest.name && manifest.icons?.length && manifest.display === "standalo
 for (const feedFile of ["rss.xml", "index.xml", "atom.xml", "feed.json"]) {
   const feed = await readFile(join(dist, feedFile), "utf8");
   assert(feed.includes("https://") && feed.includes("开始使用 Bean Blog"), `${feedFile} 缺少绝对文章内容`);
+  assert(!feed.includes("moment-2026-early-autumn"), `${feedFile} 不得混入短动态`);
 }
 
 console.log(`Static build verification passed (${requiredFiles.length} required files)`);

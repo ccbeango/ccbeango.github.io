@@ -1,4 +1,5 @@
 import type { MarkdownRenderer } from "vitepress";
+import { addMomentRichMedia } from "./moment-content.ts";
 
 const OPEN_TOKEN = "container_music_open";
 const CLOSE_TOKEN = "container_music_close";
@@ -49,7 +50,7 @@ export function musicPlugin(md: MarkdownRenderer) {
       }
       const sourceUrl = parseRemoteAudioSource(source);
       if (!sourceUrl) {
-        fail("音频地址必须是完整的 http 或 https 远程 URL", index);
+        return fail("音频地址必须是完整的 http 或 https 远程 URL", index);
       }
       let resolver: "motues" | "motues-details" | undefined;
       if (sourceUrl.hostname === "open.motues.top") {
@@ -127,7 +128,18 @@ export function musicPlugin(md: MarkdownRenderer) {
       const replacement = new state.Token("html_block", "", 0);
       replacement.block = true;
       replacement.map = opening.map;
-      replacement.content = `<MusicCard source="${escapeAttribute(source)}"${resolver ? ` resolver="${resolver}"` : ""}${title ? ` title="${escapeAttribute(title)}"` : ""}${artist ? ` artist="${escapeAttribute(artist)}"` : ""}${cover ? ` cover="${escapeAttribute(cover)}"` : ""} cover-alt="${escapeAttribute(coverAlt)}" />\n`;
+      const marker = addMomentRichMedia(state.env, {
+        type: "music",
+        source,
+        ...(resolver ? { resolver } : {}),
+        ...(title ? { title } : {}),
+        ...(artist ? { artist } : {}),
+        ...(cover ? { cover } : {}),
+        coverAlt,
+      });
+      replacement.content = marker
+        ? `<!--${marker}-->\n`
+        : `<MusicCard source="${escapeAttribute(source)}"${resolver ? ` resolver="${resolver}"` : ""}${title ? ` title="${escapeAttribute(title)}"` : ""}${artist ? ` artist="${escapeAttribute(artist)}"` : ""}${cover ? ` cover="${escapeAttribute(cover)}"` : ""} cover-alt="${escapeAttribute(coverAlt)}" />\n`;
 
       state.tokens.splice(index, closingIndex - index + 1, replacement);
     }

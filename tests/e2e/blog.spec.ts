@@ -112,8 +112,8 @@ test.describe("公开页面", () => {
     expect(await page.locator("link[rel='stylesheet'][href*='lxgw-wenkai-lite']").count()).toBe(0);
     expect(fontRequests.every((url) => new URL(url).origin === pageOrigin)).toBe(true);
     expect(fontRequests.some((url) => url.includes("cdn.jsdelivr.net"))).toBe(false);
-    expect(fontRequests.some((url) => /lxgwwenkailite-regular-subset-\d+\.woff2/.test(url))).toBe(true);
-    expect(fontRequests.some((url) => /lxgwwenkailite-medium-subset-\d+\.woff2/.test(url))).toBe(true);
+    expect(fontRequests.some((url) => /lxgwwenkailite-regular-subset-\d+(?:\.[\w-]+)?\.woff2/.test(url))).toBe(true);
+    expect(fontRequests.some((url) => /lxgwwenkailite-medium-subset-\d+(?:\.[\w-]+)?\.woff2/.test(url))).toBe(true);
     expect(await page.evaluate(() => document.fonts.check('400 16px "LXGW WenKai Lite"'))).toBe(true);
     expect(await page.evaluate(() => document.fonts.check('500 16px "LXGW WenKai Lite"'))).toBe(true);
 
@@ -372,6 +372,7 @@ test.describe("系列文章导航", () => {
       "使用 Markdown 扩展",
       "编排多图布局",
       "使用 Live Photo",
+      "发布短动态",
       "部署与发布",
     ]);
     await expect(navigation.getByText("入门与配置", { exact: true })).toBeVisible();
@@ -1202,7 +1203,7 @@ test.describe("Live Photo", () => {
     await expect(play).toBeVisible();
     await expect(play).toHaveClass(/bg-popover\/90/);
     await expectSemanticColor(play, "color", "popover-foreground");
-    await expect(play.locator("[data-live-photo-mark]")).toHaveAttribute("src", /^data:image\/svg\+xml/);
+    await expect(play.locator("[data-live-photo-mark]")).toHaveAttribute("src", "/icons/live-photo.svg");
     await expect(play).toContainText("LIVE");
     await expectNoOverflow(page);
     expect(videoRequests).toHaveLength(0);
@@ -1266,8 +1267,9 @@ test.describe("Live Photo", () => {
     expect(createdUrls).toHaveLength(1);
     await page.locator('a[href="/"]').first().click();
     await expect(page).toHaveURL("/");
-    const revokedUrls = (await readLivePhotoProbe(page)).revokedUrls;
-    expect(revokedUrls).toEqual(expect.arrayContaining(createdUrls));
+    await expect
+      .poll(async () => (await readLivePhotoProbe(page)).revokedUrls)
+      .toEqual(expect.arrayContaining(createdUrls));
     await expectNoOverflow(page);
   });
 

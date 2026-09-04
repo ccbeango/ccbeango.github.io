@@ -1,4 +1,5 @@
 import type { MarkdownRenderer } from "vitepress";
+import { addMomentRichMedia } from "./moment-content.ts";
 
 const OPEN_TOKEN = "container_link-card_open";
 const CLOSE_TOKEN = "container_link-card_close";
@@ -122,7 +123,15 @@ export function linkCardPlugin(md: MarkdownRenderer) {
       const replacement = new state.Token("html_block", "", 0);
       replacement.block = true;
       replacement.map = opening.map;
-      replacement.content = `<LinkedCard href="${escapeAttribute(href)}" title="${escapeAttribute(title)}"${description ? ` description="${escapeAttribute(description)}"` : ""} />\n`;
+      const marker = addMomentRichMedia(state.env, {
+        type: "link-card",
+        href,
+        title,
+        ...(description ? { description } : {}),
+      });
+      replacement.content = marker
+        ? `<!--${marker}-->\n`
+        : `<LinkedCard href="${escapeAttribute(href)}" title="${escapeAttribute(title)}"${description ? ` description="${escapeAttribute(description)}"` : ""} />\n`;
 
       state.tokens.splice(index, closingIndex - index + 1, replacement);
     }

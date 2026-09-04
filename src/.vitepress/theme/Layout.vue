@@ -4,10 +4,12 @@ import { computed } from "vue";
 import GlobalMusicPlayer from "./components/GlobalMusicPlayer.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import SiteHeader from "./components/SiteHeader.vue";
+import MomentHeader from "./components/MomentHeader.vue";
 import ArchivesPage from "./views/ArchivesPage.vue";
 import ArticlePage from "./views/ArticlePage.vue";
 import BlogPage from "./views/BlogPage.vue";
 import HomePage from "./views/HomePage.vue";
+import MomentPage from "./views/MomentPage.vue";
 import NotFoundPage from "./views/NotFoundPage.vue";
 import TagPage from "./views/TagPage.vue";
 import TagsPage from "./views/TagsPage.vue";
@@ -25,12 +27,15 @@ registerWatchers({ closeSidebar });
 
 <template>
   <div
-    class="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased transition-colors [font-synthesis-weight:none] dark:theme-dark"
+    class="flex min-h-screen flex-col font-sans text-foreground antialiased transition-colors [font-synthesis-weight:none] dark:theme-dark"
+    :class="layout === 'moment' ? 'bg-muted' : 'bg-background'"
   >
-    <SiteHeader />
+    <MomentHeader v-if="layout === 'moment'" />
+    <SiteHeader v-else />
     <div class="flex-1">
       <HomePage v-if="layout === 'home'" />
       <BlogPage v-else-if="layout === 'blog'" />
+      <MomentPage v-else-if="layout === 'moment'" />
       <TagsPage v-else-if="layout === 'tags'" />
       <TagPage v-else-if="layout === 'tag'" />
       <ArchivesPage v-else-if="layout === 'archives'" />

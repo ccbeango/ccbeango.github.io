@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from "@lucide/vue";
 import { withBase } from "vitepress";
 
 const props = defineProps<{ page: number; pageCount: number }>();
-const pageHref = (page: number) => page === 1 ? "/blog" : `/blog/page/${page}`;
+const pageHref = (page: number) => (page === 1 ? "/blog" : `/blog/page/${page}`);
 </script>
 
 <template>

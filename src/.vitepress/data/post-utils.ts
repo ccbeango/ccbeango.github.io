@@ -1,16 +1,19 @@
 import type { ContentData, DefaultTheme } from "vitepress";
 import type { ArchiveGroup, PostData, PostFrontmatter, TagSummary } from "./post-types.ts";
+import {
+  dateStringSchema,
+  filterPublished,
+  normalizeContentSlug,
+  normalizeStringList,
+  paginateItems,
+  sortByDateDescending,
+} from "./content-utils.ts";
 import { z } from "zod";
-
-const dateString = z.preprocess(
-  (value) => (value instanceof Date ? value.toISOString() : value),
-  z.string().refine((value) => !Number.isNaN(Date.parse(value)), "必须是有效日期"),
-);
 
 const frontmatterSchema = z.object({
   title: z.string().trim().min(1, "不能为空"),
-  date: dateString,
-  updated: dateString.optional(),
+  date: dateStringSchema,
+  updated: dateStringSchema.optional(),
   summary: z.string().trim().optional(),
   description: z.string().trim().optional(),
   keywords: z.array(z.string().trim().min(1)).default([]),
@@ -44,14 +47,6 @@ const frontmatterSchema = z.object({
   cover: z.string().trim().optional(),
   canonical: z.url().optional(),
 });
-
-function normalizeSlug(url: string) {
-  return decodeURIComponent(url)
-    .replace(/^\/posts\//, "")
-    .replace(/\.(?:html|md)$/, "")
-    .replace(/\/index$/, "")
-    .replace(/^\/+|\/+$/g, "");
-}
 
 function plainText(source: string) {
   return source
@@ -97,7 +92,7 @@ export function tagSlug(tag: string) {
 }
 
 export function toPostData(entry: ContentData): PostData {
-  const slug = normalizeSlug(entry.url);
+  const slug = normalizeContentSlug(entry.url, "posts");
   const result = frontmatterSchema.safeParse(entry.frontmatter);
   if (!result.success) {
     const details = result.error.issues
@@ -112,7 +107,7 @@ export function toPostData(entry: ContentData): PostData {
     ...frontmatter,
     summary: frontmatter.summary ?? frontmatter.description ?? "",
     description: frontmatter.description ?? frontmatter.summary ?? "",
-    tags: [...new Set(frontmatter.tags.map((tag) => tag.trim()))],
+    tags: normalizeStringList(frontmatter.tags),
     slug,
     url: `/blog/${slug}`,
     wordCount,
@@ -123,14 +118,14 @@ export function toPostData(entry: ContentData): PostData {
 }
 
 export function sortPosts<T extends Pick<PostData, "date">>(posts: T[]) {
-  return [...posts].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  return sortByDateDescending(posts);
 }
 
 export function preparePosts(entries: ContentData[], options: { includeDrafts?: boolean } = {}) {
   const posts = entries.map(toPostData);
   const duplicate = posts.find((post, index) => posts.findIndex((item) => item.slug === post.slug) !== index);
   if (duplicate) throw new Error(`文章 slug 重复：${duplicate.slug}`);
-  return sortPosts(options.includeDrafts ? posts : posts.filter((post) => !post.draft));
+  return sortPosts(filterPublished(posts, options.includeDrafts));
 }
 
 export function getFeaturedPosts(posts: PostData[], limit?: number) {
@@ -215,13 +210,7 @@ export function createSeriesSidebar(posts: PostData[]): DefaultTheme.SidebarMult
 }
 
 export function paginatePosts(posts: PostData[], page: number, pageSize: number) {
-  const pageCount = Math.max(1, Math.ceil(posts.length / pageSize));
-  const safePage = Math.min(Math.max(1, page), pageCount);
-  return {
-    page: safePage,
-    pageCount,
-    items: posts.slice((safePage - 1) * pageSize, safePage * pageSize),
-  };
+  return paginateItems(posts, page, pageSize);
 }
 
 export function collectTags(posts: PostData[]): TagSummary[] {

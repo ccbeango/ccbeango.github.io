@@ -9,6 +9,22 @@ export interface SocialLink {
   href: string;
 }
 
+export interface MomentConfigInput {
+  covers: string[];
+  displayName?: string;
+  avatar?: string;
+  signature?: string;
+  momentBatchSize: number;
+}
+
+export interface MomentConfig {
+  covers: string[];
+  displayName: string;
+  avatar: string;
+  signature: string;
+  momentBatchSize: number;
+}
+
 export interface GiscusConfig {
   repo: `${string}/${string}`;
   repoId: string;
@@ -38,8 +54,36 @@ function normalizeBase(value: string | undefined) {
   return `/${value.replace(/^\/+|\/+$/g, "")}/`;
 }
 
+export function resolveMomentConfig(
+  value: MomentConfigInput,
+  author: { name: string; bio: string },
+  favicon: string,
+): MomentConfig {
+  const covers = value.covers.map((cover) => cover.trim());
+  if (!covers.length || covers.some((cover) => !cover)) throw new Error("动态页至少需要一张非空封面");
+  if (!Number.isInteger(value.momentBatchSize) || value.momentBatchSize <= 0)
+    throw new Error("动态页每批数量必须是正整数");
+  return {
+    covers: [...new Set(covers)],
+    displayName: value.displayName?.trim() || author.name,
+    avatar: value.avatar?.trim() || favicon,
+    signature: value.signature?.trim() || author.bio,
+    momentBatchSize: value.momentBatchSize,
+  };
+}
+
 const serverEnv = typeof process === "undefined" ? undefined : process.env;
 const runtimeBase = serverEnv?.SITE_BASE ?? import.meta.env?.BASE_URL;
+const author = {
+  name: "Bean",
+  email: "hello@example.com",
+  bio: "一名持续学习的软件工程师，在这里记录实践、判断与复盘。",
+};
+const favicon = {
+  ico: "/favicon.ico",
+  png: "/favicon.png",
+  svg: "/favicon.svg",
+};
 
 export const siteConfig = {
   site: {
@@ -53,11 +97,7 @@ export const siteConfig = {
     language: "zh-CN",
     featuredPostsLimit: 5,
     postsPerPage: 3,
-    favicon: {
-      ico: "/favicon.ico",
-      png: "/favicon.png",
-      svg: "/favicon.svg",
-    },
+    favicon,
     manifest: "/site.webmanifest",
     feeds: {
       rss: "/rss.xml",
@@ -66,13 +106,19 @@ export const siteConfig = {
       json: "/feed.json",
     },
   },
-  author: {
-    name: "Bean",
-    email: "hello@example.com",
-    bio: "一名持续学习的软件工程师，在这里记录实践、判断与复盘。",
-  },
+  author,
+  moment: resolveMomentConfig(
+    {
+      covers: ["/moments/cover.webp", "/media/live-photo-sample-poster.png"],
+      signature: "记录实践、判断与复盘。",
+      momentBatchSize: 4,
+    },
+    author,
+    favicon.svg,
+  ),
   navigation: [
     { title: "文章", href: "/blog" },
+    { title: "动态", href: "/moment" },
     { title: "使用手册", href: "/blog/guide/getting-started" },
     {
       title: "浏览",

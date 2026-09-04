@@ -578,7 +578,7 @@ onBeforeUnmount(() => {
         </p>
         <div
           ref="photoStage"
-          class="relative flex min-h-0 touch-pan-y items-center justify-center overflow-hidden p-4 pt-18 sm:p-8 sm:pt-20 lg:p-12"
+          class="relative flex min-h-0 touch-pan-y items-center justify-center overflow-hidden p-4 pt-18 select-none sm:p-8 sm:pt-20 lg:p-12"
           data-photo-preview-stage
           @dblclick="resetZoom"
           @pointercancel="finishDrag"
@@ -633,6 +633,7 @@ onBeforeUnmount(() => {
             :class="isDragging ? 'cursor-grabbing' : zoomLevel > 1 ? 'cursor-grab' : 'cursor-zoom-in'"
             :src="photo.source"
             :alt="photo.alt"
+            draggable="false"
             @load="() => applyTransform()"
           />
           <button

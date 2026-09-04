@@ -12,6 +12,7 @@ import { imageGridPlugin } from "./markdown/image-grid.ts";
 import { linkCardPlugin } from "./markdown/link-card.ts";
 import { livePhotoPlugin } from "./markdown/live-photo.ts";
 import { musicPlugin } from "./markdown/music.ts";
+import { momentContentPlugin, momentRichMediaContainers } from "./markdown/moment-content.ts";
 import { photoPreviewPlugin } from "./markdown/photo-preview.ts";
 import { videoPlugin } from "./markdown/video.ts";
 import { requireSiteUrl, siteConfig, withBasePath } from "./site.config.ts";
@@ -37,7 +38,7 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
     titleTemplate: `:title | ${siteConfig.site.title}`,
     description: siteConfig.site.description,
     base: siteConfig.site.base,
-    srcExclude: ["posts/**/*.md"],
+    srcExclude: ["posts/**/*.md", "moments/**/*.md"],
     cleanUrls: true,
     lastUpdated: true,
     appearance: true,
@@ -64,10 +65,8 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
         detailsLabel: "详细信息",
         customContainers: {
           "image-grid": "图片布局",
-          "link-card": "文章引用",
+          ...momentRichMediaContainers,
           "live-photo": "Live Photo",
-          music: "音乐",
-          video: "视频",
         },
       },
       codeCopyButton: {
@@ -79,6 +78,7 @@ const config: UserConfigFn<DefaultTheme.Config> = async ({ command }) => {
         dark: "github-dark",
       },
       config(md) {
+        md.use(momentContentPlugin);
         md.use(taskLists, { enabled: true, label: true, labelAfter: true });
         md.use(imageGridPlugin);
         md.use(linkCardPlugin);

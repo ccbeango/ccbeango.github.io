@@ -49,7 +49,7 @@ pnpm dev
 
 默认地址为 `http://localhost:5173`。正文修改支持热更新；新增文章，或修改文章标题、系列归属与排序后，需要重启开发服务，因为系列 sidebar 在 VitePress 配置阶段生成。
 
-开发环境会显示 `draft: true` 的文章并标记为草稿。生产构建会从路由、列表、搜索、归档、标签、 sitemap 和 feed 中排除草稿。
+开发环境会显示 `draft: true` 的文章和动态并标记为草稿。生产构建会从公开页面及文章的搜索、归档、标签、 sitemap 和 feed 中排除草稿。
 
 ## 项目目录
 
@@ -59,19 +59,21 @@ packages/
 src/
   .vitepress/
     build/                  # robots、manifest 与 feed
-    data/                   # 文章校验和集合转换
-    markdown/               # 图片与 Live Photo 扩展
+    data/                   # 文章与动态的校验和集合转换
+    markdown/               # 内容、图片与 Live Photo 扩展
     theme/                  # 自定义主题与 Tailwind 入口
     config.ts               # VitePress 配置
     site.config.ts          # 站点身份和第三方配置
   posts/                    # Markdown 文章来源
     guide/                  # 当前使用手册
-  public/                   # 图标、封面和文章媒体
+  moments/                  # Markdown 短动态来源
+  public/                   # 图标、封面和内容媒体
   blog/                     # /blog 动态路由入口
+  moment/                   # /moment 动态聚合入口
 tests/                      # Vitest 与 Playwright
 ```
 
-`src/posts` 的目录不会公开为 `/posts`。文章文件的相对路径会转换为 `/blog/<nested-slug>`。
+`src/posts` 和 `src/moments` 都是不会直接生成同名公开路由的内容来源。文章文件的相对路径会转换为 `/blog/<nested-slug>`；短动态集中显示在单一 `/moment` 信息流中。
 
 ## 常用命令
 
@@ -136,5 +138,6 @@ ESLint 直接组合 `@eslint/js`、`typescript-eslint`、`eslint-plugin-vue` 和
 
 - [配置站点信息](/blog/guide/site-configuration)
 - [创建和组织文章](/blog/guide/writing-articles)
+- [发布短动态](/blog/guide/posting-moments)
 - [使用 Markdown 扩展](/blog/guide/markdown-extensions)
 - [部署静态站点](/blog/guide/deployment)

@@ -12,14 +12,15 @@ const publishedGuides = [
   ["markdown-extensions.md", "使用 Markdown 扩展", "内容写作", 2, 2],
   ["image-layouts.md", "编排多图布局", "内容写作", 3, 2],
   ["live-photo.md", "使用 Live Photo", "内容写作", 4, 2],
+  ["posting-moments.md", "发布短动态", "内容写作", 5, 2],
   ["deployment.md", "部署与发布", "发布与维护", 1, 3],
 ] as const;
 
 describe("博客内使用手册", () => {
-  it("只保留站点身份、功能图标、通用演示图和 Android 功能样本", async () => {
+  it("只保留站点身份、功能图标、文章演示资源和已声明来源的动态资源", async () => {
     const imageFiles = (await readdir(publicDirectory, { recursive: true }))
       .map((file) => file.replaceAll("\\", "/"))
-      .filter((file) => /\.(?:ico|jpe?g|png|svg)$/i.test(file))
+      .filter((file) => /\.(?:ico|jpe?g|png|svg|webp)$/i.test(file))
       .sort();
 
     expect(imageFiles).toEqual([
@@ -29,7 +30,11 @@ describe("博客内使用手册", () => {
       "icons/live-photo.svg",
       "live-images/android-motion-photo.jpg",
       "media/live-photo-sample-poster.png",
+      "moments/cover.webp",
     ]);
+    await expect(readFile(new URL("moments/LICENSE-Hugo-Theme-Amigo.txt", publicDirectory), "utf8")).resolves.toContain(
+      "MIT License",
+    );
   });
 
   it("以三个系列分组发布完整手册", async () => {
@@ -41,6 +46,7 @@ describe("博客内使用手册", () => {
       "image-layouts.md",
       "live-photo.md",
       "markdown-extensions.md",
+      "posting-moments.md",
       "site-configuration.md",
       "writing-articles.md",
     ]);
@@ -85,13 +91,16 @@ describe("博客内使用手册", () => {
       "::: music",
       "open.motues.top",
       "Android Motion Photo",
+      "src/moments",
+      "covers",
+      "momentBatchSize",
       "GitHub Pages",
     ]) {
       expect(manual).toContain(topic);
     }
     expect(manual).toContain("type=details");
     expect(manual).toContain("自动读取歌曲名、歌手、专辑和封面");
-    expect(manual).toContain("封面接口接收歌曲 ID，而不是 pic_id");
+    expect(manual).toContain("封面接口接收歌曲 ID，而不是 `pic_id`");
   });
 
   it("使用写作手册展示真实文章封面配置", async () => {
@@ -112,6 +121,8 @@ describe("博客内使用手册", () => {
       "SITE_BASE",
       "featuredPostsLimit",
       "postsPerPage",
+      "momentBatchSize",
+      "moment",
       "favicon.svg",
       "feeds.rssAlias",
       "navigation",
@@ -128,6 +139,15 @@ describe("博客内使用手册", () => {
       expect(source).toContain(setting);
     }
     expect(source).not.toContain("headerSocials");
+  });
+
+  it("完整说明动态正文图片与迁移规则", async () => {
+    const source = await readFile(new URL("posting-moments.md", guideDirectory), "utf8");
+
+    expect(source).toContain("![江边傍晚的云层](/media/live-photo-sample-poster.png)");
+    expect(source).toContain("图片必须连续放在正文末尾");
+    expect(source).toContain("每条动态最多九张图片");
+    expect(source).toContain("不能同时使用 frontmatter `images` 和正文图片");
   });
 
   it("保留不会进入生产输出的草稿示例", async () => {

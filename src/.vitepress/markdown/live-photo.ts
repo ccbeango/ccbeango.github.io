@@ -1,4 +1,5 @@
 import type { MarkdownRenderer } from "vitepress";
+import { addMomentRichMedia } from "./moment-content.ts";
 
 const OPEN_TOKEN = "container_live-photo_open";
 const CLOSE_TOKEN = "container_live-photo_close";
@@ -84,12 +85,20 @@ export function livePhotoPlugin(md: MarkdownRenderer) {
       const poster = image.attrGet("src");
       if (!poster) fail("图片缺少地址", index);
       const posterUrl = poster as string;
+      const isAndroid = source.toLowerCase() === "android";
 
       const replacement = new state.Token("html_block", "", 0);
       replacement.block = true;
       replacement.map = opening.map;
-      replacement.content =
-        source.toLowerCase() === "android"
+      const marker = addMomentRichMedia(state.env, {
+        type: "live-photo",
+        poster: posterUrl,
+        ...(isAndroid ? { mode: "android" as const, androidSource: posterUrl } : { video: source }),
+        alt: image.content,
+      });
+      replacement.content = marker
+        ? `<!--${marker}-->\n`
+        : isAndroid
           ? `<LivePhoto mode="android" poster="${escapeAttribute(posterUrl)}" android-source="${escapeAttribute(posterUrl)}" alt="${escapeAttribute(image.content)}" />\n`
           : `<LivePhoto poster="${escapeAttribute(posterUrl)}" video="${escapeAttribute(source)}" alt="${escapeAttribute(image.content)}" />\n`;
 
