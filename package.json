@@ -25,9 +25,8 @@
     "test:e2e": "playwright test",
     "audit:styles": "node scripts/audit-styles.mjs",
     "check:staged": "lint-staged",
-    "generate:assets": "node scripts/generate-assets.mjs",
     "verify:build": "node scripts/verify-build.mjs",
-    "check:build": "pnpm generate:assets && pnpm font:check && pnpm format:check && pnpm audit:styles && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:build",
+    "check:build": "pnpm font:check && pnpm format:check && pnpm audit:styles && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:build",
     "check": "pnpm check:build && pnpm test:e2e"
   },
   "dependencies": {
@@ -54,7 +53,6 @@
     "lint-staged": "^16.4.0",
     "markdown-it-mathjax3": "^4.3.2",
     "markdown-it-task-lists": "^2.1.1",
-    "png-to-ico": "^3.0.2",
     "postcss": "^8.5.26",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
