@@ -15,6 +15,14 @@ describe("内容数量配置", () => {
     expect(siteConfig.site.featuredPostsLimit).toBe(5);
   });
 
+  it("文章列表每页展示 10 篇文章", () => {
+    expect(siteConfig.site.postsPerPage).toBe(10);
+  });
+
+  it("使用已配置的 GitHub 主页", () => {
+    expect(siteConfig.homeSocials).toContainEqual({ label: "GitHub", href: "https://github.com/ccbeango" });
+  });
+
   it("动态每批数量为正整数", () => {
     expect(siteConfig.moment.momentBatchSize).toBe(4);
     expect(siteConfig.moment.signature).toBe("记录实践、判断与复盘。");

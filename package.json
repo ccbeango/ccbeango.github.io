@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vitepress dev src",
     "build": "vitepress build src",
-    "build:local": "cross-env SITE_URL=https://username.github.io SITE_BASE=/ vitepress build src",
+    "build:local": "cross-env SITE_URL=https://ccbeango.github.io SITE_BASE=/ vitepress build src",
     "preview": "vitepress preview src",
     "prepare": "simple-git-hooks",
     "lint": "eslint .",

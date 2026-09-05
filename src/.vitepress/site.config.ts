@@ -75,9 +75,9 @@ export function resolveMomentConfig(
 const serverEnv = typeof process === "undefined" ? undefined : process.env;
 const runtimeBase = serverEnv?.SITE_BASE ?? import.meta.env?.BASE_URL;
 const author = {
-  name: "Bean",
-  email: "hello@example.com",
-  bio: "一名持续学习的软件工程师，在这里记录实践、判断与复盘。",
+  name: "CcBean",
+  email: "liuyh940@gmail.com ",
+  bio: "靡不有初，鲜克有终。",
 };
 const favicon = {
   ico: "/favicon.ico",
@@ -87,16 +87,16 @@ const favicon = {
 
 export const siteConfig = {
   site: {
-    title: "Bean Blog",
-    name: "Bean Blog",
-    description: "记录工程实践、技术思考与持续学习。",
+    title: "CcBean Blog",
+    name: "CcBean Blog",
+    description: "记录工程实践、技术思考与持续学习、生活随心记。",
     keywords: ["VitePress", "前端开发", "工程实践", "个人博客"],
     url: serverEnv?.SITE_URL?.replace(/\/$/, "") ?? "",
     base: normalizeBase(runtimeBase),
     locale: "zh_CN",
     language: "zh-CN",
     featuredPostsLimit: 5,
-    postsPerPage: 3,
+    postsPerPage: 10,
     logo: "/logo.svg",
     favicon,
     manifest: "/site.webmanifest",
@@ -110,7 +110,11 @@ export const siteConfig = {
   author,
   moment: resolveMomentConfig(
     {
-      covers: ["/moments/cover.webp", "/media/live-photo-sample-poster.png"],
+      covers: [
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/84bdd2092221c459af8af9582507abb8.60uzt7r1xj.webp",
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/f24190b6ac5e09ad74388ea06696b3cb.99u3pve8ga.webp",
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/cca2987e0e5446c966b28c3d205cef91.13mizdgzmx.webp",
+      ],
       signature: "记录实践、判断与复盘。",
       momentBatchSize: 4,
     },
@@ -130,7 +134,7 @@ export const siteConfig = {
     },
   ] satisfies NavItem[],
   homeSocials: [
-    { label: "GitHub", href: "https://github.com/" },
+    { label: "GitHub", href: "https://github.com/ccbeango" },
     { label: "RSS", href: "/rss.xml" },
   ] satisfies SocialLink[],
   giscus: null as GiscusConfig | null,
