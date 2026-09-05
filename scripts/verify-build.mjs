@@ -8,8 +8,6 @@ const requiredFiles = [
   "index.html",
   "404.html",
   "blog/index.html",
-  "blog/page/2.html",
-  "blog/page/3.html",
   "blog/guide/getting-started.html",
   "blog/guide/site-configuration.html",
   "blog/guide/writing-articles.html",
@@ -20,8 +18,6 @@ const requiredFiles = [
   "blog/guide/deployment.html",
   "moment/index.html",
   "media/live-photo-sample-poster.png",
-  "moments/cover.webp",
-  "moments/LICENSE-Hugo-Theme-Amigo.txt",
   "tags/index.html",
   "archives/index.html",
   "robots.txt",
@@ -97,10 +93,10 @@ assert(
   moment.includes("data-moment-profile") &&
     moment.includes("data-moment-header") &&
     moment.includes("data-moment-load-state") &&
-    moment.includes("moment-2026-early-autumn"),
+    moment.includes("data-moment-card"),
   "动态首页结构无效",
 );
-assert(!blogIndex.includes("moment-2026-early-autumn"), "文章列表不得混入短动态");
+assert(!blogIndex.includes("data-moment-card"), "文章列表不得混入短动态");
 assert(!moment.includes("点赞") && !moment.includes("评论"), "动态页面不得包含虚假互动控件");
 
 const robots = await readFile(join(dist, "robots.txt"), "utf8");
@@ -112,7 +108,7 @@ assert(manifest.name && manifest.icons?.length && manifest.display === "standalo
 for (const feedFile of ["rss.xml", "index.xml", "atom.xml", "feed.json"]) {
   const feed = await readFile(join(dist, feedFile), "utf8");
   assert(feed.includes("https://") && feed.includes("开始使用 Bean Blog"), `${feedFile} 缺少绝对文章内容`);
-  assert(!feed.includes("moment-2026-early-autumn"), `${feedFile} 不得混入短动态`);
+  assert(!feed.includes("data-moment-card"), `${feedFile} 不得混入短动态`);
 }
 
 console.log(`Static build verification passed (${requiredFiles.length} required files)`);

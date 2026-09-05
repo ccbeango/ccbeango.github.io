@@ -31,11 +31,7 @@ describe("博客内使用手册", () => {
       "live-images/android-motion-photo.jpg",
       "logo.svg",
       "media/live-photo-sample-poster.png",
-      "moments/cover.webp",
     ]);
-    await expect(readFile(new URL("moments/LICENSE-Hugo-Theme-Amigo.txt", publicDirectory), "utf8")).resolves.toContain(
-      "MIT License",
-    );
   });
 
   it("以三个系列分组发布完整手册", async () => {

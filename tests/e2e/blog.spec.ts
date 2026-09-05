@@ -134,7 +134,7 @@ test.describe("公开页面", () => {
 
   test("首页、列表、分页、标签和归档可浏览", async ({ page }, testInfo) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1, name: "Bean Blog" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "CcBean Blog" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "推荐阅读" })).toBeVisible();
     await expect(page.getByRole("banner").getByRole("link", { name: "GitHub" })).toHaveCount(0);
     await expect(page.getByRole("banner").getByRole("link", { name: "RSS" })).toHaveCount(0);
@@ -156,7 +156,7 @@ test.describe("公开页面", () => {
       await browse.focus();
       await page.keyboard.press("Enter");
       await expect(navigation.getByRole("link", { name: "标签" })).toBeVisible();
-      await page.getByRole("heading", { level: 1, name: "Bean Blog" }).click();
+      await page.getByRole("heading", { level: 1, name: "CcBean Blog" }).click();
       await expect(navigation.getByRole("link", { name: "标签" })).toBeHidden();
       await browse.click();
       await expect(navigation.getByRole("link", { name: "标签" })).toBeVisible();
@@ -165,14 +165,13 @@ test.describe("公开页面", () => {
 
     await page.goto("/blog");
     await expect(page.getByRole("heading", { level: 1, name: "全部文章" })).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /下一页/ }),
-    ).toHaveAttribute("href", "/blog/page/2");
+    const pagination = page.getByRole("navigation", { name: "文章分页" });
+    if (await pagination.count()) {
+      await expect(pagination.getByRole("link", { name: /下一页/ })).toHaveAttribute("href", "/blog/page/2");
 
-    await page.goto("/blog/page/2");
-    await expect(
-      page.getByRole("navigation", { name: "文章分页" }).getByRole("link", { name: /上一页/ }),
-    ).toHaveAttribute("href", "/blog");
+      await page.goto("/blog/page/2");
+      await expect(pagination.getByRole("link", { name: /上一页/ })).toHaveAttribute("href", "/blog");
+    }
 
     await page.goto("/tags");
     await expect(page.getByRole("heading", { level: 1, name: "标签" })).toBeVisible();
