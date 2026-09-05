@@ -21,6 +21,8 @@ cover: /media/live-photo-sample-poster.png
 
 每篇文章都是 `src/posts` 下的 Markdown 文件。新增文件并填写 frontmatter 后，文章会自动进入列表、标签、归档、搜索和 feed，不需要再维护一份文章清单。
 
+页面主标题由 frontmatter 的 `title` 自动生成。正文直接从普通段落或 `##` 二级标题开始，不要再添加 `#` 一级标题，否则页面会出现重复主标题。
+
 ## 文件路径与公开 URL
 
 文件相对 `src/posts` 的路径就是完整 slug：

@@ -63,6 +63,7 @@ describe("博客内使用手册", () => {
       });
       expect(data.summary).toEqual(expect.any(String));
       expect(content).toMatch(/^\s*\S/);
+      expect(content).not.toMatch(/^\s*#[ \t]+\S/);
       expect(content).toContain("## ");
     }
   });
@@ -105,6 +106,7 @@ describe("博客内使用手册", () => {
     const { data, content } = matter(source);
 
     expect(data.cover).toBe("/media/live-photo-sample-poster.png");
+    expect(content).toContain("正文直接从普通段落或 `##` 二级标题开始");
     expect(content).toContain("## 文章封面");
     expect(content).toContain("cover: /media/live-photo-sample-poster.png");
     expect(content).toContain("点击封面可以进入与正文图片相同的照片预览");

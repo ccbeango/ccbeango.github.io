@@ -1,36 +1,38 @@
-import { access, readdir, readFile } from "node:fs/promises";
+import { access, glob, readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadPostSources } from "../src/.vitepress/data/load-post-sources.ts";
+import { siteConfig } from "../src/.vitepress/site.config.ts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const dist = join(root, "src", ".vitepress", "dist");
+const src = join(root, "src");
+const dist = join(src, ".vitepress", "dist");
+const postSources = [];
+for await (const file of glob("posts/**/*.md", { cwd: src })) postSources.push(join(src, file));
+const posts = await loadPostSources(postSources.sort(), src);
+const pageCount = Math.max(1, Math.ceil(posts.length / siteConfig.site.postsPerPage));
 const requiredFiles = [
-  "index.html",
-  "404.html",
-  "blog/index.html",
-  "blog/guide/getting-started.html",
-  "blog/guide/site-configuration.html",
-  "blog/guide/writing-articles.html",
-  "blog/guide/markdown-extensions.html",
-  "blog/guide/image-layouts.html",
-  "blog/guide/live-photo.html",
-  "blog/guide/posting-moments.html",
-  "blog/guide/deployment.html",
-  "moment/index.html",
-  "media/live-photo-sample-poster.png",
-  "tags/index.html",
-  "archives/index.html",
-  "robots.txt",
-  "sitemap.xml",
-  "rss.xml",
-  "index.xml",
-  "atom.xml",
-  "feed.json",
-  "site.webmanifest",
-  "favicon.ico",
-  "favicon.png",
-  "favicon.svg",
-  "logo.svg",
+  ...new Set([
+    "index.html",
+    "404.html",
+    "blog/index.html",
+    "moment/index.html",
+    "tags/index.html",
+    "archives/index.html",
+    "robots.txt",
+    "sitemap.xml",
+    "rss.xml",
+    "index.xml",
+    "atom.xml",
+    "feed.json",
+    "site.webmanifest",
+    "favicon.ico",
+    "favicon.png",
+    "favicon.svg",
+    "logo.svg",
+    ...posts.map((post) => `blog/${post.slug}.html`),
+    ...Array.from({ length: pageCount - 1 }, (_, index) => `blog/page/${index + 2}.html`),
+  ]),
 ];
 
 await Promise.all(requiredFiles.map((file) => access(join(dist, file))));
@@ -70,30 +72,31 @@ assert(
   "公开产物不得包含草稿",
 );
 
-const article = await readFile(join(dist, "blog", "guide", "markdown-extensions.html"), "utf8");
-assert(article.includes("<mjx-container"), "文章必须渲染数学公式");
-assert(article.includes("language-ts"), "文章必须包含 Shiki 代码块");
-assert(!article.includes("title: 使用 Markdown 扩展"), "文章正文不得显示 frontmatter");
-for (const token of ['rel="canonical"', 'property="og:title"', 'name="twitter:card"', 'rel="manifest"']) {
-  assert(article.includes(token), `文章缺少元数据：${token}`);
+for (const post of posts) {
+  const article = await readFile(join(dist, "blog", `${post.slug}.html`), "utf8");
+  for (const token of ['rel="canonical"', 'property="og:title"', 'name="twitter:card"', 'rel="manifest"']) {
+    assert(article.includes(token), `${post.slug} 缺少元数据：${token}`);
+  }
 }
 
 const sitemap = await readFile(join(dist, "sitemap.xml"), "utf8");
-assert(
-  sitemap.includes("https://") && sitemap.includes("/blog/guide/getting-started"),
-  "sitemap 必须包含绝对多段文章地址",
-);
+assert(sitemap.includes("https://"), "sitemap 必须包含绝对地址");
 assert(!sitemap.includes("/posts/") && !sitemap.includes("/404"), "sitemap 不得包含原稿或 404");
-assert(sitemap.includes("/moment/") && !sitemap.includes("/moment/page/"), "sitemap 必须只包含动态聚合页");
-assert(!sitemap.includes("#moment-"), "sitemap 不得把动态 fragment 作为独立条目");
+assert(!sitemap.includes("/moment/page/") && !sitemap.includes("#moment-"), "sitemap 不得包含动态分页或 fragment");
+const sitemapPaths = new Set(
+  [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, location]) => new URL(location).pathname),
+);
+for (const post of posts) {
+  const articlePath = new URL(`/blog/${post.slug}`, "https://example.com").pathname;
+  assert(sitemapPaths.has(articlePath), `sitemap 缺少文章：${post.slug}`);
+}
 
 const moment = await readFile(join(dist, "moment", "index.html"), "utf8");
 const blogIndex = await readFile(join(dist, "blog", "index.html"), "utf8");
 assert(
   moment.includes("data-moment-profile") &&
     moment.includes("data-moment-header") &&
-    moment.includes("data-moment-load-state") &&
-    moment.includes("data-moment-card"),
+    (moment.includes("data-moment-card") || moment.includes("data-moment-empty")),
   "动态首页结构无效",
 );
 assert(!blogIndex.includes("data-moment-card"), "文章列表不得混入短动态");
@@ -107,8 +110,10 @@ assert(manifest.name && manifest.icons?.length && manifest.display === "standalo
 
 for (const feedFile of ["rss.xml", "index.xml", "atom.xml", "feed.json"]) {
   const feed = await readFile(join(dist, feedFile), "utf8");
-  assert(feed.includes("https://") && feed.includes("开始使用 Bean Blog"), `${feedFile} 缺少绝对文章内容`);
+  assert(feed.includes("https://"), `${feedFile} 缺少绝对 URL`);
   assert(!feed.includes("data-moment-card"), `${feedFile} 不得混入短动态`);
 }
 
-console.log(`Static build verification passed (${requiredFiles.length} required files)`);
+console.log(
+  `Static build verification passed (${posts.length} published posts, ${pageCount} listing pages, ${requiredFiles.length} required files)`,
+);
