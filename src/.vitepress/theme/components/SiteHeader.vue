@@ -28,11 +28,11 @@ const articleRoute = computed(() =>
         title="首页"
       >
         <img
-          class="size-9 shrink-0"
-          :src="withBase('/favicon.svg')"
+          class="size-10 shrink-0 rounded-md"
+          :src="withBase(siteConfig.site.logo)"
           alt=""
-          width="36"
-          height="36"
+          width="40"
+          height="40"
         />
         <span class="hidden truncate font-bold sm:block">{{ siteConfig.site.name }}</span>
       </a>

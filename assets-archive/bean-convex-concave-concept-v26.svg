@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="120 100 960 960" role="img" aria-labelledby="title desc">
-  <title id="title">豆字摄影主题细条闪光灯标志</title>
-  <desc id="desc">由带细长照明留空的闪光灯、黄金比例凸形相机、镜头圆环，以及开放式凹形支架和轻量底横组成的豆字摄影标志。</desc>
+  <title id="title">豆字摄影主题灯珠闪光灯标志</title>
+  <desc id="desc">由带可见灯珠和宽照明区域的闪光灯、黄金比例凸形相机、镜头圆环，以及开放式凹形支架和轻量底横组成的豆字摄影标志。</desc>
 
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
@@ -16,7 +16,7 @@
     </filter>
     <mask id="flash-head" x="320" y="100" width="560" height="100" maskUnits="userSpaceOnUse">
       <rect x="330" y="112" width="540" height="76" rx="22" fill="white" />
-      <rect x="400" y="143" width="400" height="14" rx="7" fill="black" />
+      <rect x="410" y="131" width="380" height="38" rx="10" fill="black" />
     </mask>
   </defs>
 
@@ -37,6 +37,18 @@
           fill="url(#surface)"
           mask="url(#flash-head)"
         />
+
+        <g fill="url(#surface)">
+          <circle cx="440" cy="150" r="8" />
+          <circle cx="480" cy="150" r="8" />
+          <circle cx="520" cy="150" r="8" />
+          <circle cx="560" cy="150" r="8" />
+          <circle cx="600" cy="150" r="8" />
+          <circle cx="640" cy="150" r="8" />
+          <circle cx="680" cy="150" r="8" />
+          <circle cx="720" cy="150" r="8" />
+          <circle cx="760" cy="150" r="8" />
+        </g>
       </g>
 
       <rect x="250" y="899" width="700" height="50" rx="25" fill="url(#surface)" />

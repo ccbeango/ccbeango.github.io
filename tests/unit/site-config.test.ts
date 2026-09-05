@@ -7,6 +7,10 @@ afterEach(() => {
 });
 
 describe("内容数量配置", () => {
+  it("使用独立的站点 Logo", () => {
+    expect(siteConfig.site.logo).toBe("/logo.svg");
+  });
+
   it("首页最多展示 5 篇推荐文章", () => {
     expect(siteConfig.site.featuredPostsLimit).toBe(5);
   });

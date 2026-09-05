@@ -29,6 +29,7 @@ describe("博客内使用手册", () => {
       "favicon.svg",
       "icons/live-photo.svg",
       "live-images/android-motion-photo.jpg",
+      "logo.svg",
       "media/live-photo-sample-poster.png",
       "moments/cover.webp",
     ]);

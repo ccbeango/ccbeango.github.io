@@ -97,6 +97,7 @@ export const siteConfig = {
     language: "zh-CN",
     featuredPostsLimit: 5,
     postsPerPage: 3,
+    logo: "/logo.svg",
     favicon,
     manifest: "/site.webmanifest",
     feeds: {

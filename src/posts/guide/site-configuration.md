@@ -72,13 +72,14 @@ env:
 | `language`           | `string`   | 按需     | HTML、VitePress 和 Feed 的语言代码                              | `zh-CN`                              |
 | `featuredPostsLimit` | `number`   | 按需     | 首页“推荐阅读”最多展示的最新文章数量                            | `5`                                  |
 | `postsPerPage`       | `number`   | 按需     | 文章列表每页显示的文章数量                                      | `3`                                  |
+| `logo`               | `string`   | 是       | 页头品牌 Logo 的公开路径                                        | `/logo.svg`                          |
 | `favicon`            | `object`   | 是       | 浏览器和设备图标路径，字段见下表                                | 见下表                               |
 | `manifest`           | `string`   | 按需     | Web App Manifest 的公开路径                                     | `/site.webmanifest`                  |
 | `feeds`              | `object`   | 按需     | RSS、Atom 和 JSON Feed 的输出路径                               | 见下表                               |
 
 ### 图标配置
 
-`favicon` 的文件应保存在 `src/public`，配置值使用以 `/` 开头的公开路径。构建时会自动拼接 `SITE_BASE`。
+Logo 与 favicon 文件保存在 `src/public`，配置值使用以 `/` 开头的公开路径。根目录的 `bean-convex-concave-concept-v33.svg` 是图标源文件，运行 `pnpm generate:assets` 会同步生成 `logo.svg`、三种 favicon 文件；构建时会自动拼接 `SITE_BASE`。
 
 | 配置          | 类型     | 建议修改 | 用途           | 当前值         |
 | ------------- | -------- | -------- | -------------- | -------------- |

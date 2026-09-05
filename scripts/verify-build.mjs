@@ -34,6 +34,7 @@ const requiredFiles = [
   "favicon.ico",
   "favicon.png",
   "favicon.svg",
+  "logo.svg",
 ];
 
 await Promise.all(requiredFiles.map((file) => access(join(dist, file))));
