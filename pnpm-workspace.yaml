@@ -7,4 +7,3 @@ allowBuilds:
 
 onlyBuiltDependencies:
   - esbuild
-  - sharp

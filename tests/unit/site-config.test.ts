@@ -6,18 +6,31 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe("内容数量配置", () => {
-  it("使用独立的站点 Logo", () => {
-    expect(siteConfig.site.logo).toBe("/logo.svg");
+describe("站点配置契约", () => {
+  it("提供有效的站点身份、内容数量和公开资源路径", () => {
+    expect(siteConfig.site.title.trim()).not.toBe("");
+    expect(siteConfig.site.name.trim()).not.toBe("");
+    expect(siteConfig.site.description.trim()).not.toBe("");
+    expect(siteConfig.author.name.trim()).not.toBe("");
+    expect(siteConfig.site.logo).toMatch(/^\/\S+$/);
+    for (const path of Object.values(siteConfig.site.favicon)) expect(path).toMatch(/^\/\S+$/);
+
+    for (const value of [
+      siteConfig.site.featuredPostsLimit,
+      siteConfig.site.postsPerPage,
+      siteConfig.moment.momentBatchSize,
+    ]) {
+      expect(Number.isInteger(value)).toBe(true);
+      expect(value).toBeGreaterThan(0);
+    }
+    expect(siteConfig.moment.covers.length).toBeGreaterThan(0);
+    for (const social of siteConfig.homeSocials) {
+      expect(social.label.trim()).not.toBe("");
+      expect(social.href.trim()).not.toBe("");
+    }
   });
 
-  it("首页最多展示 5 篇推荐文章", () => {
-    expect(siteConfig.site.featuredPostsLimit).toBe(5);
-  });
-
-  it("动态每批数量为正整数", () => {
-    expect(siteConfig.moment.momentBatchSize).toBe(4);
-    expect(siteConfig.moment.signature).toBe("记录实践、判断与复盘。");
+  it("拒绝无效的动态批次配置", () => {
     expect(() =>
       resolveMomentConfig(
         { covers: ["/cover.jpg"], momentBatchSize: 0 },
@@ -71,7 +84,7 @@ describe("动态身份配置", () => {
 
     expect(configuredSite.site.base).toBe("/bean-blog/");
     expect(withBasePath("/moment")).toBe("/bean-blog/moment");
-    expect(withBasePath("/moments/cover.webp")).toBe("/bean-blog/moments/cover.webp");
+    expect(withBasePath("/assets/cover.webp")).toBe("/bean-blog/assets/cover.webp");
     expect(withBasePath("https://images.example.com/cover.webp")).toBe("https://images.example.com/cover.webp");
   });
 });
