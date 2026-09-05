@@ -75,9 +75,9 @@ export function resolveMomentConfig(
 const serverEnv = typeof process === "undefined" ? undefined : process.env;
 const runtimeBase = serverEnv?.SITE_BASE ?? import.meta.env?.BASE_URL;
 const author = {
-  name: "Bean",
-  email: "hello@example.com",
-  bio: "一名持续学习的软件工程师，在这里记录实践、判断与复盘。",
+  name: "CcBean",
+  email: "liuyh940@gmail.com",
+  bio: "靡不有初，鲜克有终。",
 };
 const favicon = {
   ico: "/favicon.ico",
@@ -87,16 +87,16 @@ const favicon = {
 
 export const siteConfig = {
   site: {
-    title: "Bean Blog",
-    name: "Bean Blog",
-    description: "记录工程实践、技术思考与持续学习。",
+    title: "CcBean Blog",
+    name: "CcBean Blog",
+    description: "记录工程实践、技术思考与持续学习、生活随心记。",
     keywords: ["VitePress", "前端开发", "工程实践", "个人博客"],
     url: serverEnv?.SITE_URL?.replace(/\/$/, "") ?? "",
     base: normalizeBase(runtimeBase),
     locale: "zh_CN",
     language: "zh-CN",
     featuredPostsLimit: 5,
-    postsPerPage: 3,
+    postsPerPage: 10,
     logo: "/logo.svg",
     favicon,
     manifest: "/site.webmanifest",
@@ -110,8 +110,12 @@ export const siteConfig = {
   author,
   moment: resolveMomentConfig(
     {
-      covers: ["/moments/cover.webp", "/media/live-photo-sample-poster.png"],
-      signature: "记录实践、判断与复盘。",
+      covers: [
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/84bdd2092221c459af8af9582507abb8.60uzt7r1xj.webp",
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/f24190b6ac5e09ad74388ea06696b3cb.99u3pve8ga.webp",
+        "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/cca2987e0e5446c966b28c3d205cef91.13mizdgzmx.webp",
+      ],
+      signature: "向   前看！",
       momentBatchSize: 4,
     },
     author,
@@ -120,20 +124,29 @@ export const siteConfig = {
   navigation: [
     { title: "文章", href: "/blog" },
     { title: "动态", href: "/moment" },
-    { title: "使用手册", href: "/blog/guide/getting-started" },
     {
       title: "浏览",
       children: [
+        { title: "使用手册", href: "/blog/guide/getting-started" },
         { title: "标签", href: "/tags" },
         { title: "归档", href: "/archives" },
       ],
     },
   ] satisfies NavItem[],
   homeSocials: [
-    { label: "GitHub", href: "https://github.com/" },
+    { label: "GitHub", href: "https://github.com/ccbeango" },
     { label: "RSS", href: "/rss.xml" },
   ] satisfies SocialLink[],
-  giscus: null as GiscusConfig | null,
+  giscus: {
+    repo: "ccbeango/ccbeango.github.io",
+    repoId: "R_kgDOUNKoMA",
+    category: "Announcements",
+    categoryId: "DIC_kwDOUNKoMM4DFDGS",
+    mapping: "pathname",
+    reactionsEnabled: "1",
+    inputPosition: "bottom",
+    lang: "zh-CN",
+  } satisfies GiscusConfig | null,
 };
 
 export function requireSiteUrl() {
