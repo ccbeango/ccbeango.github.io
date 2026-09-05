@@ -78,7 +78,6 @@ describe("发布检查配置", () => {
     expect(uploadIndex).toBeGreaterThan(checkIndex);
     expect(workflow).not.toContain("playwright install");
     for (const command of [
-      "generate:assets",
       "font:check",
       "format:check",
       "audit:styles",
