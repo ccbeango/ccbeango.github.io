@@ -65,7 +65,7 @@ export function formatExposureTime(value: number | undefined) {
   return `${formatNumber(value, 2)} 秒`;
 }
 
-export function formatCapturedAt(value: unknown) {
+function formatCapturedAt(value: unknown) {
   const date =
     value instanceof Date
       ? value
