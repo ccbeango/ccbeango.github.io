@@ -1,19 +1,36 @@
 import type { ContentData } from "vitepress";
 import type { MomentData, MomentFrontmatter, MomentRichMedia } from "./moment-types.ts";
-import { dateStringSchema, filterPublished, normalizeContentSlug, normalizeStringList } from "./content-utils.ts";
+import { filterPublished, normalizeContentSlug, normalizeStringList } from "./content-utils.ts";
 import { z } from "zod";
 
 const momentTimeZone = "Asia/Shanghai";
+const localMomentDatePattern = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?$/;
 
-function dateParts(value: Date) {
+function dateTimeParts(value: Date) {
   const parts = new Intl.DateTimeFormat("zh-CN", {
     year: "numeric",
     month: "numeric",
     day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
     timeZone: momentTimeZone,
   }).formatToParts(value);
   const number = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value);
-  return { year: number("year"), month: number("month"), day: number("day") };
+  return {
+    year: number("year"),
+    month: number("month"),
+    day: number("day"),
+    hour: number("hour"),
+    minute: number("minute"),
+    second: number("second"),
+  };
+}
+
+function dateParts(value: Date) {
+  const { year, month, day } = dateTimeParts(value);
+  return { year, month, day };
 }
 
 function calendarDay(value: { year: number; month: number; day: number }) {
@@ -54,11 +71,73 @@ export function formatMomentDateTime(value: string) {
   }).format(new Date(value));
 }
 
+function normalizeLocalMomentDate(value: string) {
+  const match = localMomentDatePattern.exec(value);
+  if (!match) return undefined;
+  const [, yearValue, monthValue, dayValue, hourValue = "00", minuteValue = "00", secondValue = "00"] = match;
+  const expected = {
+    year: Number(yearValue),
+    month: Number(monthValue),
+    day: Number(dayValue),
+    hour: Number(hourValue),
+    minute: Number(minuteValue),
+    second: Number(secondValue),
+  };
+  const utcGuess = Date.UTC(
+    expected.year,
+    expected.month - 1,
+    expected.day,
+    expected.hour,
+    expected.minute,
+    expected.second,
+  );
+  const guess = new Date(utcGuess);
+  if (
+    guess.getUTCFullYear() !== expected.year ||
+    guess.getUTCMonth() + 1 !== expected.month ||
+    guess.getUTCDate() !== expected.day ||
+    guess.getUTCHours() !== expected.hour ||
+    guess.getUTCMinutes() !== expected.minute ||
+    guess.getUTCSeconds() !== expected.second
+  )
+    return null;
+
+  const zonedGuess = dateTimeParts(guess);
+  const zoneOffset =
+    Date.UTC(
+      zonedGuess.year,
+      zonedGuess.month - 1,
+      zonedGuess.day,
+      zonedGuess.hour,
+      zonedGuess.minute,
+      zonedGuess.second,
+    ) - utcGuess;
+  const date = new Date(utcGuess - zoneOffset);
+  const actual = dateTimeParts(date);
+  if (
+    Object.keys(expected).some((key) => actual[key as keyof typeof actual] !== expected[key as keyof typeof expected])
+  )
+    return null;
+  return date.toISOString();
+}
+
+const momentDateStringSchema = z.preprocess(
+  (value) => (value instanceof Date ? value.toISOString().slice(0, 19).replace("T", " ") : value),
+  z.string().transform((value, context) => {
+    const localDate = normalizeLocalMomentDate(value);
+    if (localDate) return localDate;
+    const timestamp = localDate === undefined ? Date.parse(value) : Number.NaN;
+    if (!Number.isNaN(timestamp)) return new Date(timestamp).toISOString();
+    context.addIssue({ code: "custom", message: "必须是有效日期" });
+    return z.NEVER;
+  }),
+);
+
 const optionalText = z.string().trim().min(1, "不能为空").optional();
 const momentFrontmatterSchema = z.object({
   title: optionalText,
-  date: dateStringSchema,
-  updated: dateStringSchema.optional(),
+  date: momentDateStringSchema,
+  updated: momentDateStringSchema.optional(),
   location: optionalText,
   tags: z.array(z.string().trim().min(1, "不能为空")).default([]),
   images: z

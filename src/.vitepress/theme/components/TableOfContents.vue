@@ -155,7 +155,7 @@ onContentUpdated(async () => {
         />
       </summary>
       <div
-        class="absolute top-14 right-0 left-0 max-h-[calc(100vh-var(--spacing-header))] overflow-y-auto rounded-md border border-border bg-popover p-4 text-popover-foreground shadow-md sm:right-0 sm:left-auto sm:w-80 xl:static xl:max-h-[calc(100vh-var(--spacing-side-rail-viewport))] xl:w-auto xl:overflow-y-auto xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
+        class="absolute top-14 right-0 left-0 max-h-[calc(100vh-var(--spacing-header))] scrollbar-subtle overflow-y-auto rounded-md border border-border bg-popover p-4 text-popover-foreground shadow-md sm:right-0 sm:left-auto sm:w-80 xl:static xl:max-h-[calc(100vh-var(--spacing-side-rail-viewport))] xl:w-auto xl:overflow-y-auto xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
       >
         <p class="hidden items-center gap-2 text-xs font-medium text-muted-foreground xl:flex">
           <List

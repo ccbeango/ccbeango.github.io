@@ -211,6 +211,11 @@
   transition-duration: var(--duration-slow);
 }
 
+@utility scrollbar-subtle {
+  scrollbar-color: var(--color-border) transparent;
+  scrollbar-width: thin;
+}
+
 @utility music-record-paused {
   animation-play-state: paused;
 }

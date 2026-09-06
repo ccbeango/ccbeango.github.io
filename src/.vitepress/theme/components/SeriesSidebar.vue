@@ -43,7 +43,7 @@ onUnmounted(() => document.removeEventListener("pointerdown", handleDocumentPoin
     </button>
     <div
       id="series-sidebar-navigation"
-      class="absolute top-14 left-0 max-h-[calc(100vh-var(--spacing-header))] w-[min(var(--container-side-panel),calc(100vw-2.5rem))] overflow-y-auto rounded-md border border-border bg-popover p-4 text-popover-foreground shadow-md xl:static xl:block xl:max-h-[calc(100vh-var(--spacing-side-rail-viewport))] xl:w-auto xl:overflow-y-auto xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
+      class="absolute top-14 left-0 max-h-[calc(100vh-var(--spacing-header))] w-[min(var(--container-side-panel),calc(100vw-2.5rem))] scrollbar-subtle overflow-y-auto rounded-md border border-border bg-popover p-4 text-popover-foreground shadow-md xl:static xl:block xl:max-h-[calc(100vh-var(--spacing-side-rail-viewport))] xl:w-auto xl:overflow-y-auto xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
       :class="isOpen ? 'block' : 'hidden xl:block'"
     >
       <nav aria-label="系列文章">
