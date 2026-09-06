@@ -1,5 +1,6 @@
 import type { ContentData, MarkdownEnv } from "vitepress";
 import { createMarkdownRenderer, disposeMdItInstance } from "vitepress";
+import matter from "gray-matter";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
@@ -27,7 +28,7 @@ function entry(slug: string, frontmatter: Record<string, unknown> = {}, html = "
     html,
     excerpt: undefined,
     frontmatter: {
-      date: "2026-09-01T12:00:00+08:00",
+      date: "2026-09-01 12:00:00",
       ...frontmatter,
     },
   };
@@ -65,7 +66,7 @@ describe("动态 frontmatter 与标识", () => {
     const moment = toMomentData(
       entry("photo", {
         title: " 晚霞 ",
-        updated: new Date("2026-09-02T12:00:00+08:00"),
+        updated: "2026-09-02 12:00:00",
         location: " 杭州 ",
         tags: [" 摄影 ", "摄影"],
         images: [{ src: " /moments/sunset.jpg ", alt: " 湖边晚霞 " }],
@@ -79,11 +80,27 @@ describe("动态 frontmatter 与标识", () => {
       images: [{ src: "/moments/sunset.jpg", alt: "湖边晚霞" }],
       pinned: true,
     });
-    expect(moment.updated).toContain("2026-09-02");
+    expect(moment.updated).toBe("2026-09-02T04:00:00.000Z");
+  });
+
+  it("将无时区日期时间按站点默认时区规范化", () => {
+    const parsed = matter("---\ndate: 2021-12-18 13:58:12\n---").data;
+    const moment = toMomentData(
+      entry("local-date-time", {
+        ...parsed,
+        updated: "2021-12-18 14:05:09",
+      }),
+    );
+
+    expect(parsed.date).toBeInstanceOf(Date);
+    expect(moment.date).toBe("2021-12-18T05:58:12.000Z");
+    expect(moment.updated).toBe("2021-12-18T06:05:09.000Z");
+    expect(formatMomentDateTime(moment.date)).toBe("2021年12月18日 13:58");
   });
 
   it("拒绝无效字段、过多图片、重复 slug 与 fragment", () => {
     expect(() => toMomentData(entry("invalid", { date: "not-a-date" }))).toThrow(/date/);
+    expect(() => toMomentData(entry("invalid", { date: "2026-02-30 12:00:00" }))).toThrow(/date/);
     expect(() => toMomentData(entry("invalid", { location: "" }))).toThrow(/location/);
     expect(() => toMomentData(entry("invalid", { images: [{ src: "/photo.jpg", alt: "" }] }))).toThrow(
       /images\.0\.alt/,
@@ -116,6 +133,15 @@ describe("动态集合", () => {
       "draft",
       "regular-new",
     ]);
+  });
+
+  it("使用秒级时间对动态排序", () => {
+    const moments = prepareMoments([
+      entry("earlier", { date: "2026-09-04 12:00:01" }),
+      entry("later", { date: "2026-09-04 12:00:02" }),
+    ]);
+
+    expect(moments.map((moment) => moment.slug)).toEqual(["later", "earlier"]);
   });
 
   it("与长文章使用互不混合的内容加载入口", async () => {
