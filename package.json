@@ -5,9 +5,15 @@
   "private": true,
   "packageManager": "pnpm@11.24.0",
   "description": "A reading-focused VitePress blog",
-  "author": "",
+  "author": "ccbean",
   "license": "ISC",
-  "keywords": [],
+  "keywords": [
+    "vitepress",
+    "vue",
+    "typescript",
+    "tailwindcss",
+    "blog"
+  ],
   "scripts": {
     "dev": "vitepress dev src",
     "build": "vitepress build src",
@@ -53,7 +59,6 @@
     "lint-staged": "^16.4.0",
     "markdown-it-mathjax3": "^4.3.2",
     "markdown-it-task-lists": "^2.1.1",
-    "postcss": "^8.5.26",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "simple-git-hooks": "^2.14.0",

@@ -72,9 +72,6 @@ importers:
       markdown-it-task-lists:
         specifier: ^2.1.1
         version: 2.1.1
-      postcss:
-        specifier: ^8.5.26
-        version: 8.5.26
       prettier:
         specifier: ^3.9.6
         version: 3.9.6

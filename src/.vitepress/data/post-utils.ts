@@ -117,7 +117,7 @@ export function toPostData(entry: ContentData): PostData {
   };
 }
 
-export function sortPosts<T extends Pick<PostData, "date">>(posts: T[]) {
+function sortPosts<T extends Pick<PostData, "date">>(posts: T[]) {
   return sortByDateDescending(posts);
 }
 

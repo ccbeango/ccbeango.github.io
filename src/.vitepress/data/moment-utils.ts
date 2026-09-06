@@ -110,7 +110,7 @@ export function toMomentData(entry: MomentContentData): MomentData {
   };
 }
 
-export function sortMoments(moments: MomentData[]) {
+function sortMoments(moments: MomentData[]) {
   return [...moments].sort((a, b) => Number(b.pinned) - Number(a.pinned) || Date.parse(b.date) - Date.parse(a.date));
 }
 

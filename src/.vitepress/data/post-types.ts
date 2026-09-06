@@ -1,4 +1,4 @@
-export interface PostSeries {
+interface PostSeries {
   name: string;
   order: number;
   sidebar?: string;
