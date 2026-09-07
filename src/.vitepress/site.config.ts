@@ -146,7 +146,7 @@ export const siteConfig = {
     reactionsEnabled: "1",
     inputPosition: "bottom",
     lang: "zh-CN",
-  } satisfies GiscusConfig,
+  } satisfies GiscusConfig | null,
 };
 
 export function requireSiteUrl() {
