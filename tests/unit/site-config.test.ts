@@ -88,7 +88,7 @@ describe("giscus 配置", () => {
   it("站点配置关闭评论或提供完整参数", () => {
     expect(siteConfig.giscus === null || isGiscusConfigured(siteConfig.giscus)).toBe(true);
   });
-  
+
   it("拒绝缺失字段的部分配置", () => {
     expect(isGiscusConfigured(null)).toBe(false);
     expect(isGiscusConfigured({ repo: "owner/repo", repoId: "R_1" })).toBe(false);
