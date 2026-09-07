@@ -115,7 +115,7 @@ export const siteConfig = {
         "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/f24190b6ac5e09ad74388ea06696b3cb.99u3pve8ga.webp",
         "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/cca2987e0e5446c966b28c3d205cef91.13mizdgzmx.webp",
       ],
-      signature: "记录实践、判断与复盘。",
+      signature: "向   前看！",
       momentBatchSize: 4,
     },
     author,
@@ -124,10 +124,10 @@ export const siteConfig = {
   navigation: [
     { title: "文章", href: "/blog" },
     { title: "动态", href: "/moment" },
-    { title: "使用手册", href: "/blog/guide/getting-started" },
     {
       title: "浏览",
       children: [
+        { title: "使用手册", href: "/blog/guide/getting-started" },
         { title: "标签", href: "/tags" },
         { title: "归档", href: "/archives" },
       ],
@@ -137,7 +137,16 @@ export const siteConfig = {
     { label: "GitHub", href: "https://github.com/ccbeango" },
     { label: "RSS", href: "/rss.xml" },
   ] satisfies SocialLink[],
-  giscus: null as GiscusConfig | null,
+  giscus: {
+    repo: "ccbeango/ccbeango.github.io",
+    repoId: "R_kgDOUNKoMA",
+    category: "Announcements",
+    categoryId: "DIC_kwDOUNKoMM4DFDGS",
+    mapping: "pathname",
+    reactionsEnabled: "1",
+    inputPosition: "bottom",
+    lang: "zh-CN",
+  } satisfies GiscusConfig,
 };
 
 export function requireSiteUrl() {
