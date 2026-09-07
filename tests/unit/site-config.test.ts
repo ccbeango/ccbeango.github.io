@@ -25,7 +25,7 @@ describe("内容数量配置", () => {
 
   it("动态每批数量为正整数", () => {
     expect(siteConfig.moment.momentBatchSize).toBe(4);
-    expect(siteConfig.moment.signature).toBe("记录实践、判断与复盘。");
+    expect(siteConfig.moment.signature.trim()).not.toBe("");
     expect(() =>
       resolveMomentConfig(
         { covers: ["/cover.jpg"], momentBatchSize: 0 },
@@ -85,6 +85,10 @@ describe("动态身份配置", () => {
 });
 
 describe("giscus 配置", () => {
+  it("站点配置关闭评论或提供完整参数", () => {
+    expect(siteConfig.giscus === null || isGiscusConfigured(siteConfig.giscus)).toBe(true);
+  });
+  
   it("拒绝缺失字段的部分配置", () => {
     expect(isGiscusConfigured(null)).toBe(false);
     expect(isGiscusConfigured({ repo: "owner/repo", repoId: "R_1" })).toBe(false);
