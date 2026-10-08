@@ -4,7 +4,7 @@ import { filterPublished, normalizeContentSlug, normalizeStringList } from "./co
 import { z } from "zod";
 
 const momentTimeZone = "Asia/Shanghai";
-const localMomentDatePattern = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?$/;
+const localMomentDatePattern = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/;
 
 function dateTimeParts(value: Date) {
   const parts = new Intl.DateTimeFormat("zh-CN", {

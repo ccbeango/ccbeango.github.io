@@ -12,15 +12,24 @@ const container = ref<HTMLElement>();
 const marker = ref<HTMLElement>();
 const route = useRoute();
 const hashSyncTick = ref(0);
-const outlineItems = computed(() => headers.value.flatMap(header => [
-  header,
-  ...(header.children ?? []),
-]));
+const outlineItems = computed(() => flattenHeaders(headers.value));
 let hashSyncPending = false;
 let hashSyncTimer: number | undefined;
 let wideViewport: MediaQueryList | undefined;
 
 useActiveAnchor(container, marker);
+
+function flattenHeaders(items: DefaultTheme.OutlineItem[]): DefaultTheme.OutlineItem[] {
+  return items.flatMap(item => [item, ...flattenHeaders(item.children ?? [])]);
+}
+
+function getOutlineIndent(level: number) {
+  if (level === 4)
+    return "pl-6";
+  if (level === 3)
+    return "pl-3";
+  return "";
+}
 
 function syncActiveHash() {
   hashSyncPending = false;
@@ -127,7 +136,7 @@ onUnmounted(() => {
 onContentUpdated(async () => {
   closeNarrowOutline();
   await nextTick();
-  headers.value = getHeaders([2, 3]);
+  headers.value = getHeaders([2, 4]);
   await nextTick();
   armHashSync();
 });
@@ -180,7 +189,7 @@ onContentUpdated(async () => {
             <li
               v-for="header in outlineItems"
               :key="header.link"
-              :class="header.level === 3 ? 'pl-3' : ''"
+              :class="getOutlineIndent(header.level)"
             >
               <a
                 class="outline-link block rounded-sm px-1.5 py-1 leading-5 text-muted-foreground transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"

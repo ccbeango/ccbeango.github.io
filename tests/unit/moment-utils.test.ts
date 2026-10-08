@@ -100,9 +100,22 @@ describe("动态 frontmatter 与标识", () => {
     expect(formatMomentDateTime(moment.date)).toBe("2021年12月18日 13:58");
   });
 
+  it("将省略秒数的动态时间按站点默认时区解析", () => {
+    const parsed = matter("---\ndate: 2026-09-23 22:26\n---").data;
+    const moment = toMomentData(entry("short-local-date-time", parsed));
+
+    expect(moment.date).toBe("2026-09-23T14:26:00.000Z");
+    expect(formatMomentDateTime(moment.date)).toBe("2026年9月23日 22:26");
+    expect(formatMomentTime(moment.date, new Date("2026-09-24T12:00:00+08:00"))).toBe("昨天");
+    expect(toMomentData(entry("short-updated", { updated: "2026-09-23 22:26" })).updated).toBe(
+      "2026-09-23T14:26:00.000Z",
+    );
+  });
+
   it("拒绝无效字段、过多图片、重复 slug 与 fragment", () => {
     expect(() => toMomentData(entry("invalid", { date: "not-a-date" }))).toThrow(/date/);
     expect(() => toMomentData(entry("invalid", { date: "2026-02-30 12:00:00" }))).toThrow(/date/);
+    expect(() => toMomentData(entry("invalid", { date: "2026-02-30 12:00" }))).toThrow(/date/);
     expect(() => toMomentData(entry("invalid", { location: "" }))).toThrow(/location/);
     expect(() => toMomentData(entry("invalid", { images: [{ src: "/photo.jpg", alt: "" }] }))).toThrow(
       /images\.0\.alt/,

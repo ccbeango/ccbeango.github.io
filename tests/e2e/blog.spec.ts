@@ -34,4 +34,19 @@ test.describe("博客核心页面", () => {
     await expect(page.locator("main h1")).toBeVisible();
     await expect(page.locator("main a[href='/blog']")).toBeVisible();
   });
+
+  test("文章目录包含四级标题", async ({ page }) => {
+    await page.goto("/blog/traveling/travling-hu-hang-su");
+
+    const heading = page.locator("main h4").first();
+    const id = await heading.getAttribute("id");
+    if (!id) throw new Error("测试文章缺少带锚点的四级标题");
+
+    const trigger = page.getByTitle("本文目录");
+    if (await trigger.isVisible()) await trigger.click();
+
+    const item = page.getByRole("navigation", { name: "本文目录" }).locator(`li:has(a[href="#${id}"])`);
+    await expect(item.getByRole("link")).toBeVisible();
+    await expect(item).toHaveClass(/\bpl-6\b/);
+  });
 });
