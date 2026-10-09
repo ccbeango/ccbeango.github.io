@@ -21,6 +21,25 @@
 - **WHEN** 动态缺少日期、日期无效、可选字符串为空、图片缺少 `src` 或 `alt`、图片超过九张、slug 重复或 fragment 冲突
 - **THEN** 构建失败并报告对应动态、字段或冲突来源
 
+### Requirement: 命名头像选择
+
+动态 frontmatter MAY 提供非空字符串 `avatar`，引用 `siteConfig.moment.avatars` 中区分大小写的名称。系统 SHALL 在已有构建期模型中将名称解析为图片地址，MUST 拒绝未知名称、空值与非字符串并报告动态来源和 `avatar` 字段。头像 MUST 不进入图库或正文内容块。
+
+#### Scenario: 按名称选择头像
+
+- **WHEN** 站点配置 `avatars.travel` 且动态声明 `avatar: travel`
+- **THEN** 该动态模型包含对应图片地址，原有正文与图库保持各自含义
+
+#### Scenario: 未指定头像
+
+- **WHEN** 动态没有声明 `avatar`
+- **THEN** 该动态没有单条头像覆盖，继续使用站点默认头像
+
+#### Scenario: 引用了不存在的名称
+
+- **WHEN** 动态声明的头像名称不在站点头像库中
+- **THEN** 构建失败并指出该动态、`avatar` 和未配置的名称
+
 ### Requirement: 动态 Markdown 与普通图库
 
 系统 SHALL 使用项目的 VitePress Markdown renderer 在构建期解析动态正文，并 SHALL 基于 parser token 从正文末尾提取标准 Markdown 图片、从正文 token 流移除对应图片段落，再将图片按原顺序写入动态模型供图库展示。系统 MUST NOT 在浏览器中解析 Markdown，也 MUST NOT 通过正则、最终 HTML 或整篇字符串替换提取图片。动态正文 SHALL 支持普通段落、强调、链接、列表和换行。
@@ -169,3 +188,12 @@
 
 - **WHEN** 动态显示名、头像或签名未单独配置
 - **THEN** 页面分别使用现有作者名、站点图标或作者简介，且仍能正常构建
+
+### Requirement: 集中配置多个可选头像
+
+业务配置 SHALL 允许通过可选的 `moment.avatars` 名称到图片地址映射提供多个头像，省略时 SHALL 使用空映射。名称与地址 MUST 为非空字符串并去除首尾空白，规范化后的名称 MUST 唯一，地址 MUST 为本地公开路径或完整 http/https URL。已有 `moment.avatar` SHALL 继续作为默认头像地址，省略或留空时回退到站点 favicon。
+
+#### Scenario: 配置命名头像库
+
+- **WHEN** 作者提供多个本地或远程头像并分别命名
+- **THEN** 这些名称可供动态 frontmatter 选择，默认头像与现有身份回退继续有效

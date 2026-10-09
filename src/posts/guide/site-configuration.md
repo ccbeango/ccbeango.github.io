@@ -114,13 +114,14 @@ Logo 与 favicon 文件保存在 `src/public`，配置值使用以 `/` 开头的
 
 `siteConfig.moment` 集中控制 `/moment` 的个人区和滚动批次，不需要在每条动态中重复声明作者身份。
 
-| 配置              | 类型       | 建议修改 | 用途                                            | 当前值示例                   |
-| ----------------- | ---------- | -------- | ----------------------------------------------- | ---------------------------- |
-| `covers`          | `string[]` | 是       | 个人区封面列表，进入页面时随机选择一张          | `[/moments/cover.webp, ...]` |
-| `displayName`     | `string`   | 按需     | 动态作者名；省略或留空时回退到 `author.name`    | `Bean`                       |
-| `avatar`          | `string`   | 按需     | 动态头像；省略或留空时回退到 `site.favicon.svg` | `/favicon.svg`               |
-| `signature`       | `string`   | 按需     | 个人签名；省略或留空时回退到 `author.bio`       | `一名持续学习的软件工程师。` |
-| `momentBatchSize` | `number`   | 按需     | 首批和后续每批动态数量，必须是正整数            | `4`                          |
+| 配置              | 类型                     | 建议修改 | 用途                                            | 当前值示例                         |
+| ----------------- | ------------------------ | -------- | ----------------------------------------------- | ---------------------------------- |
+| `covers`          | `string[]`               | 是       | 个人区封面列表，进入页面时随机选择一张          | `[/moments/cover.webp, ...]`       |
+| `displayName`     | `string`                 | 按需     | 动态作者名；省略或留空时回退到 `author.name`    | `Bean`                             |
+| `avatar`          | `string`                 | 按需     | 动态头像；省略或留空时回退到 `site.favicon.svg` | `/favicon.svg`                     |
+| `avatars`         | `Record<string, string>` | 按需     | 可按名称选择的头像库，省略时为空                | `{ daily: "/moments/daily.webp" }` |
+| `signature`       | `string`                 | 按需     | 个人签名；省略或留空时回退到 `author.bio`       | `一名持续学习的软件工程师。`       |
+| `momentBatchSize` | `number`                 | 按需     | 首批和后续每批动态数量，必须是正整数            | `4`                                |
 
 `covers` 至少提供一项，空路径会导致配置加载失败，重复路径会自动去重。每次进入 `/moment` 时页面随机选择一张，停留期间不会自行切换：
 
@@ -128,7 +129,22 @@ Logo 与 favicon 文件保存在 `src/public`，配置值使用以 `/` 开头的
 covers: ["/moments/cover.webp", "/moments/cover-spring.webp", "/moments/cover-night.webp"],
 ```
 
-封面和头像应存放在 `src/public`，配置值使用以 `/` 开头的公开路径。页面会为这些路径和动态图片统一拼接 `SITE_BASE`。完整写作格式见[发布短动态](/blog/guide/posting-moments)。
+`moment.avatar` 是顶部个人区和未指定头像的动态共用的默认头像。当前配置显式使用 `avatar: favicon.svg`，也可以独立设置为 `avatar: "/moments/avatar.webp"`；省略或留空仍回退到站点图标。
+
+需要发布动态时选择不同头像，可在同一配置中通过 `avatars` 为图片命名：
+
+```ts
+avatar: favicon.svg,
+avatars: {
+  default: favicon.svg,
+  daily: "/moments/daily.webp",
+  travel: "https://images.example.com/travel.webp",
+},
+```
+
+动态文件的 frontmatter 填写 `avatar: daily` 即可选择 `avatars.daily`。省略 `avatar` 时继续使用 `moment.avatar`，顶部个人区始终使用默认头像，不随单条选择变化。头像名称区分大小写，可以使用中文；名称和地址都会去除首尾空白，不能为空，规范化后的名称不能重复。未配置的名称会在构建期报告对应动态的 `avatar` 错误，frontmatter 中填写的是名称，不是图片地址。
+
+本地封面和头像存放在 `src/public`，配置值使用以 `/` 开头的公开路径；也可使用完整 `http/https` 图片 URL。页面会为本地路径和动态图片统一拼接 `SITE_BASE`，远程 URL 保持原地址。完整写作格式见[发布短动态](/blog/guide/posting-moments)。
 
 ## 导航配置
 

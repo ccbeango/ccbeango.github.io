@@ -28,6 +28,8 @@ export type MomentContentBlock = { type: "html"; html: string } | MomentRichMedi
 
 export interface MomentFrontmatter {
   title?: string;
+  /** siteConfig.moment.avatars 中的名称。 */
+  avatar?: string;
   date: string;
   updated?: string;
   location?: string;
@@ -37,7 +39,9 @@ export interface MomentFrontmatter {
   draft: boolean;
 }
 
-export type MomentData = MomentFrontmatter & {
+export type MomentData = Omit<MomentFrontmatter, "avatar"> & {
+  /** 构建期从头像名称解析出的公开图片地址。 */
+  avatar?: string;
   slug: string;
   fragment: string;
   content: MomentContentBlock[];

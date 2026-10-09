@@ -13,6 +13,7 @@ export interface MomentConfigInput {
   covers: string[];
   displayName?: string;
   avatar?: string;
+  avatars?: Record<string, string>;
   signature?: string;
   momentBatchSize: number;
 }
@@ -21,6 +22,7 @@ export interface MomentConfig {
   covers: string[];
   displayName: string;
   avatar: string;
+  avatars: Record<string, string>;
   signature: string;
   momentBatchSize: number;
 }
@@ -63,10 +65,36 @@ export function resolveMomentConfig(
   if (!covers.length || covers.some((cover) => !cover)) throw new Error("动态页至少需要一张非空封面");
   if (!Number.isInteger(value.momentBatchSize) || value.momentBatchSize <= 0)
     throw new Error("动态页每批数量必须是正整数");
+  if (
+    value.avatars !== undefined &&
+    (!value.avatars || typeof value.avatars !== "object" || Array.isArray(value.avatars))
+  )
+    throw new Error("moment.avatars 必须是名称到图片地址的对象");
+  const avatars = Object.fromEntries(
+    Object.entries(value.avatars ?? {}).map(([name, source]) => {
+      const key = name.trim();
+      if (!key || typeof source !== "string" || !source.trim())
+        throw new Error("moment.avatars 的名称与图片地址必须是非空字符串");
+      const path = source.trim();
+      if (!/^\/(?!\/)/.test(path)) {
+        let valid = false;
+        try {
+          valid = ["http:", "https:"].includes(new URL(path).protocol);
+        } catch {
+          /* Invalid URL. */
+        }
+        if (!valid) throw new Error(`moment.avatars.${key} 必须是本地公开路径或完整 http/https URL`);
+      }
+      return [key, path];
+    }),
+  );
+  if (Object.keys(avatars).length !== Object.keys(value.avatars ?? {}).length)
+    throw new Error("moment.avatars 的名称去除首尾空白后不能重复");
   return {
     covers: [...new Set(covers)],
     displayName: value.displayName?.trim() || author.name,
     avatar: value.avatar?.trim() || favicon,
+    avatars,
     signature: value.signature?.trim() || author.bio,
     momentBatchSize: value.momentBatchSize,
   };
@@ -115,6 +143,12 @@ export const siteConfig = {
         "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/f24190b6ac5e09ad74388ea06696b3cb.99u3pve8ga.webp",
         "https://cdn.jsdelivr.net/gh/ccbeango/picx-images-hosting@master/moments/cca2987e0e5446c966b28c3d205cef91.13mizdgzmx.webp",
       ],
+      avatar: favicon.svg,
+      avatars: {
+        default: favicon.svg,
+        hao: "/avatar/hao.jpg",
+        lu: "/avatar/lu.jpg",
+      },
       signature: "向   前看！",
       momentBatchSize: 4,
     },

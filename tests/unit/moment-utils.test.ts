@@ -52,6 +52,35 @@ function createMomentMarkdownRenderer() {
 }
 
 describe("动态 frontmatter 与标识", () => {
+  it("从 Markdown header 按名称选择头像并保留原有内容", () => {
+    const frontmatter = matter("---\ndate: 2026-09-01\navatar: 日常\n---\n正文").data;
+    const [moment] = prepareMoments([entry("avatar-test", frontmatter)], { avatars: { 日常: "/avatars/daily.svg" } });
+    expect(moment.avatar).toBe("/avatars/daily.svg");
+    expect(moment.images).toEqual([]);
+    expect(moment.content).toEqual([{ type: "html", html: "<p>一条短动态</p>" }]);
+    expect(toMomentData(entry("default")).avatar).toBeUndefined();
+    expect(
+      toMomentData(entry("remote", { avatar: "travel" }), { travel: "https://images.example.com/a.svg" }).avatar,
+    ).toBe("https://images.example.com/a.svg");
+    expect(toMomentData(entry("trim", { avatar: " 日常 " }), { 日常: "/a.svg" }).avatar).toBe("/a.svg");
+  });
+
+  it.each([
+    "missing",
+    "constructor",
+    "__proto__",
+    "/avatar.svg",
+    "https://images.example.com/a.svg",
+    "",
+    " ",
+    null,
+    1,
+    [],
+  ])("拒绝无效或未配置的头像名称 %j", (avatar) => {
+    expect(() => toMomentData(entry("unknown-avatar", { avatar }), { daily: "/a.svg" })).toThrow(
+      /动态 unknown-avatar.*avatar/,
+    );
+  });
   it("保留嵌套 slug 并填充默认值", () => {
     expect(toMomentData(entry("life/evening-walk"))).toMatchObject({
       slug: "life/evening-walk",

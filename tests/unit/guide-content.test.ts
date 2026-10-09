@@ -12,6 +12,7 @@ describe("博客内使用手册", () => {
       siteConfig.site.logo,
       ...Object.values(siteConfig.site.favicon),
       siteConfig.moment.avatar,
+      ...Object.values(siteConfig.moment.avatars),
       ...siteConfig.moment.covers,
     ].filter((path) => /^\/(?!\/)/.test(path));
 

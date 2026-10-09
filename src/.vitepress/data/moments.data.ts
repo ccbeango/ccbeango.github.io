@@ -14,6 +14,7 @@ import { livePhotoPlugin } from "../markdown/live-photo.ts";
 import { musicPlugin } from "../markdown/music.ts";
 import { videoPlugin } from "../markdown/video.ts";
 import { prepareMoments } from "./moment-utils.ts";
+import { siteConfig } from "../site.config.ts";
 
 const srcDir = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const momentParser = createMarkdownRenderer(srcDir, {
@@ -49,6 +50,7 @@ export default createContentLoader("moments/**/*.md", {
 
     return prepareMoments(entriesWithMomentContent, {
       includeDrafts: process.env.NODE_ENV !== "production",
+      avatars: siteConfig.moment.avatars,
     });
   },
 });

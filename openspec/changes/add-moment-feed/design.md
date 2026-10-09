@@ -30,7 +30,9 @@ Moment 面向微博、X、Instagram 或朋友圈式短内容，作者会在独�
 
 新增 `src/moments/**/*.md`、`MomentFrontmatter` 和 `MomentData`。动态与文章分别保持清晰契约，但日期解析、slug 规范化、草稿过滤、排序和 base path 等无业务差异的逻辑使用现有共享工具。
 
-动态 frontmatter 以 `date` 为必填字段，`title`、`updated`、`location`、`tags`、`pinned` 和 `draft` 按需声明；`images` 仅作为迁移期兼容入口。站点是单作者博客，显示名、头像、签名、个人封面列表和每批数量集中配置在 `site.config.ts`，避免每条动态重复身份数据。
+动态 frontmatter 以 `date` 为必填字段，`title`、`avatar`、`updated`、`location`、`tags`、`pinned` 和 `draft` 按需声明；`images` 仅作为迁移期兼容入口。站点是单作者博客，显示名、默认头像、命名头像库、签名、个人封面列表和每批数量集中配置在 `site.config.ts`，避免每条动态重复图片地址与身份数据。
+
+`moment.avatars` 为可选的名称到图片地址映射，省略时规范化为空对象。配置加载时去除名称与地址首尾空白，拒绝空值、规范化后重复名称及非本地公开路径或完整 http/https URL。动态 frontmatter 的 `avatar` 仅引用已配置名称，现有构建期加载器通过 `prepareMoments` 解析为 `MomentData.avatar` 图片地址；未知名称报对应动态和字段错误。未指定时由页面使用 `moment.avatar`，其省略或留空时沿用 favicon 回退。卡片复用 `withBase` 处理地址，个人区始终使用默认头像。
 
 备选方案是复用 `PostData` 并增加 `kind`。这会让长文标题、SEO、系列、字数和阅读时间污染短动态契约，也容易使搜索、标签、归档和 Feed 意外混入动态，因此不采用。
 

@@ -92,10 +92,44 @@ describe("可修改站点配置", () => {
     for (const value of [siteConfig.moment.displayName, siteConfig.moment.avatar, siteConfig.moment.signature])
       expectNonEmpty(value);
     expect(isSupportedHref(siteConfig.moment.avatar)).toBe(true);
+    for (const [name, source] of Object.entries(siteConfig.moment.avatars)) {
+      expectNonEmpty(name);
+      expect(isSupportedHref(source)).toBe(true);
+    }
   });
 });
 
 describe("动态身份配置", () => {
+  it("规范化多头像名称与地址，省略时使用空列表", () => {
+    const config = resolveMomentConfig(
+      {
+        covers: ["/cover.jpg"],
+        momentBatchSize: 4,
+        avatars: { " 日常 ": " /avatars/daily.webp ", travel: " https://images.example.com/travel.webp " },
+      },
+      { name: "Bean", bio: "简介" },
+      "/fallback.svg",
+    );
+    expect(config.avatars).toEqual({ 日常: "/avatars/daily.webp", travel: "https://images.example.com/travel.webp" });
+    expect(config.avatar).toBe("/fallback.svg");
+  });
+
+  it.each<Record<string, string>>([
+    { " ": "/a.svg" },
+    { daily: " " },
+    { daily: "relative.png" },
+    { daily: "//images.example.com/a.png" },
+    { daily: "javascript:alert(1)" },
+    { daily: "/a.svg", " daily ": "/b.svg" },
+  ])("拒绝无效头像列表 %j", (avatars) => {
+    expect(() =>
+      resolveMomentConfig(
+        { covers: ["/cover.jpg"], momentBatchSize: 4, avatars },
+        { name: "Bean", bio: "简介" },
+        "/fallback.svg",
+      ),
+    ).toThrow(/moment\.avatars/);
+  });
   it("拒绝无效的动态批次配置", () => {
     expect(() =>
       resolveMomentConfig(
@@ -123,6 +157,7 @@ describe("动态身份配置", () => {
       covers: ["/cover.jpg", "/cover-alt.jpg"],
       displayName: "Moment Bean",
       avatar: "/avatar.jpg",
+      avatars: {},
       signature: "随手记录",
       momentBatchSize: 6,
     });

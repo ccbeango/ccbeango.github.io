@@ -136,6 +136,7 @@ const momentDateStringSchema = z.preprocess(
 const optionalText = z.string().trim().min(1, "不能为空").optional();
 const momentFrontmatterSchema = z.object({
   title: optionalText,
+  avatar: optionalText,
   date: momentDateStringSchema,
   updated: momentDateStringSchema.optional(),
   location: optionalText,
@@ -168,7 +169,7 @@ export function momentFragment(slug: string) {
 
 export type MomentContentData = ContentData & { momentContent?: MomentContentBlock[] };
 
-export function toMomentData(entry: MomentContentData): MomentData {
+export function toMomentData(entry: MomentContentData, avatars: Record<string, string> = {}): MomentData {
   const slug = normalizeContentSlug(entry.url, "moments");
   const result = momentFrontmatterSchema.safeParse(entry.frontmatter);
   if (!result.success) {
@@ -179,8 +180,13 @@ export function toMomentData(entry: MomentContentData): MomentData {
   }
 
   const frontmatter = result.data as MomentFrontmatter;
+  if (frontmatter.avatar && !Object.hasOwn(avatars, frontmatter.avatar))
+    throw new Error(
+      `动态 ${slug || entry.url} 的 avatar 无效：未配置头像 ${frontmatter.avatar}，请在 moment.avatars 中定义`,
+    );
   return {
     ...frontmatter,
+    avatar: frontmatter.avatar ? avatars[frontmatter.avatar] : undefined,
     tags: normalizeStringList(frontmatter.tags),
     slug,
     fragment: momentFragment(slug),
@@ -192,8 +198,11 @@ function sortMoments(moments: MomentData[]) {
   return [...moments].sort((a, b) => Number(b.pinned) - Number(a.pinned) || Date.parse(b.date) - Date.parse(a.date));
 }
 
-export function prepareMoments(entries: MomentContentData[], options: { includeDrafts?: boolean } = {}) {
-  const moments = entries.map(toMomentData);
+export function prepareMoments(
+  entries: MomentContentData[],
+  options: { includeDrafts?: boolean; avatars?: Record<string, string> } = {},
+) {
+  const moments = entries.map((entry) => toMomentData(entry, options.avatars));
   const duplicateSlug = moments.find(
     (moment, index) => moments.findIndex((item) => item.slug === moment.slug) !== index,
   );

@@ -14,7 +14,6 @@ const loadTrigger = ref<HTMLButtonElement>();
 const loading = ref(false);
 const visibleMoments = computed(() => momentItems.value.slice(0, visibleCount.value));
 const hasMore = computed(() => visibleCount.value < momentItems.value.length);
-const avatar = computed(() => withBase(siteConfig.moment.avatar));
 let observer: IntersectionObserver | undefined;
 
 async function loadMore() {
@@ -92,7 +91,7 @@ onBeforeUnmount(() => {
         :key="moment.slug"
         :moment="moment"
         :author-name="siteConfig.moment.displayName"
-        :avatar="avatar"
+        :avatar="withBase(moment.avatar ?? siteConfig.moment.avatar)"
         page-path="/moment"
       />
       <div
